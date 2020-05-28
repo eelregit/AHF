@@ -47,16 +47,16 @@ void write_filename(char *f_name, char *prefix, unsigned l1dim)
 {
    int  slen, i;                  /* string length                  */
    char file_no[10];              /* file number                    */
-   
+
    /* prepare filename */
    f_name = strcpy(f_name, prefix);
-   
+
    itoa_(l1dim, file_no);
    slen = strlen(file_no);
    if (slen < L1DIM_LENGTH)
      {
       file_no[L1DIM_LENGTH] = '\0';
-      
+
       for(i=L1DIM_LENGTH-1; i >= (L1DIM_LENGTH-slen); i--)
         {
          file_no[i] = file_no[i-(L1DIM_LENGTH-slen)];
@@ -68,22 +68,22 @@ void write_filename(char *f_name, char *prefix, unsigned l1dim)
      }
    f_name = strcat(f_name, file_no);
    f_name = strcat(f_name, ".DAT");
-   
+
 }
 
 /*===========================================================================
- * calculate Laplace operator acting on potential at a given node 
+ * calculate Laplace operator acting on potential at a given node
  *===========================================================================*/
 double Laplace_pot(nptr tsc_nodes[3][3][3], double spacing2)
 {
 #ifndef AHFlean
   double Lpot;
-  
+
   Lpot = (  (double)tsc_nodes[1][1][2]->pot + (double)tsc_nodes[1][1][0]->pot
           + (double)tsc_nodes[1][2][1]->pot + (double)tsc_nodes[1][0][1]->pot
           + (double)tsc_nodes[2][1][1]->pot + (double)tsc_nodes[0][1][1]->pot
           - 6. * (double)tsc_nodes[1][1][1]->pot) / spacing2;
-  
+
   return Lpot;
 #else
    fprintf(stderr, "%s should not be called when AHFlean is defined.\n",
@@ -94,18 +94,18 @@ double Laplace_pot(nptr tsc_nodes[3][3][3], double spacing2)
 }
 
 /*===========================================================================
- * calculate Laplace operator acting on temp[1] at a given node 
+ * calculate Laplace operator acting on temp[1] at a given node
  *===========================================================================*/
 double Laplace_temp1(nptr tsc_nodes[3][3][3], double spacing2)
 {
 #ifndef AHFlean
   double Ltemp1;
-  
+
   Ltemp1 = (  (double)tsc_nodes[1][1][2]->force.temp[1] + (double)tsc_nodes[1][1][0]->force.temp[1]
             + (double)tsc_nodes[1][2][1]->force.temp[1] + (double)tsc_nodes[1][0][1]->force.temp[1]
             + (double)tsc_nodes[2][1][1]->force.temp[1] + (double)tsc_nodes[0][1][1]->force.temp[1]
             - 6. * (double)tsc_nodes[1][1][1]->force.temp[1]) / spacing2;
-  
+
   return Ltemp1;
 #else
    fprintf(stderr, "%s should not be called when AHFlean is defined.\n",
@@ -125,7 +125,7 @@ double f1mod(double x, double y)
    else if(x >= 1.0)
       return(x-1.0);
    else
-      return(x);   
+      return(x);
 }
 
 
@@ -137,13 +137,13 @@ void get_axes(double itensor[3][3], double *axis1, double *axis2, double *axis3)
    int           n, i, j, nrot;
    unsigned long idx[4];
    double        a[4][4], d[4], v[4][4], tmp[4];
-   
+
    n = NDIM;
-   
+
    for(i=0; i<4; i++)
       for(j=0; j<4; j++)
          a[i][j] = 0.0;
-   
+
    a[1][1] = itensor[0][0];
    a[2][1] = itensor[1][0];
    a[3][1] = itensor[2][0];
@@ -153,13 +153,13 @@ void get_axes(double itensor[3][3], double *axis1, double *axis2, double *axis3)
    a[1][3] = itensor[0][2];
    a[2][3] = itensor[1][2];
    a[3][3] = itensor[2][2];
-   
+
    jacobi(a, n, d, v, &nrot);
-   
+
    for(i=1; i<=n; i++)
       tmp[i] = d[i];
    indexx((unsigned long)n, tmp, idx);
-   
+
    *axis1 = d[idx[3]];
    *axis2 = d[idx[2]];
    *axis3 = d[idx[1]];
@@ -167,11 +167,11 @@ void get_axes(double itensor[3][3], double *axis1, double *axis2, double *axis3)
    itensor[0][0] = v[1][idx[3]];
    itensor[1][0] = v[2][idx[3]];
    itensor[2][0] = v[3][idx[3]];
-   
+
    itensor[0][1] = v[1][idx[2]];
    itensor[1][1] = v[2][idx[2]];
    itensor[2][1] = v[3][idx[2]];
-   
+
    itensor[0][2] = v[1][idx[1]];
    itensor[1][2] = v[2][idx[1]];
    itensor[2][2] = v[3][idx[1]];
@@ -183,16 +183,16 @@ void get_axes(double itensor[3][3], double *axis1, double *axis2, double *axis3)
 int idx_inv(unsigned long *idx, int numHalos, int i)
 {
   int j;
-  
+
   if(i<0)
     return(-1);
-  
+
   for(j=0; j<numHalos; j++)
    {
     if(idx[j] == i)
       break;
    }
-  
+
   return(j);
 }
 
@@ -202,22 +202,22 @@ int idx_inv(unsigned long *idx, int numHalos, int i)
  *  Calculates the minima and the maxima
  */
 MINMAX MinMax(double x,double xmin,double xmax) {
-   
-   MINMAX tmpMinMax;		
-   
+
+   MINMAX tmpMinMax;
+
    if (x < xmin)
       tmpMinMax.min = x;
    else
       tmpMinMax.min = xmin;
-   
+
    if (x > xmax)
       tmpMinMax.max = x;
    else
       tmpMinMax.max = xmax;
-   
-   
+
+
    return(tmpMinMax);
-   
+
 }
 /*
  ************************************************************
@@ -225,32 +225,32 @@ MINMAX MinMax(double x,double xmin,double xmax) {
  *  Calculates the minima and the maxima for the periodic refinements
  */
 MINMAX MinMaxBound(double div, double x,double xmin,double xmax) {
-   
-   MINMAX tmpMinMax;		
-   
-   
+
+   MINMAX tmpMinMax;
+
+
    if ( x < div ) {
-      
+
       if (x > xmax)
          tmpMinMax.max = x;
       else
          tmpMinMax.max = xmax;
-      
+
       tmpMinMax.min = xmin;
-      
+
    } else {
-      
+
       if (x < xmin)
          tmpMinMax.min = x;
       else
          tmpMinMax.min = xmin;
-      
+
       tmpMinMax.max = xmax;
-						
+
    }
-   
+
    return(tmpMinMax);
-   
+
 }
 
 /*==============================================================================
@@ -261,18 +261,18 @@ void binning_parameter(HALO halo, int *nbins, double *dist_min, double *dist_max
   partptr cur_part;
   double  dX, dY, dZ, Xc, Yc, Zc;
   long    npart, binpart;
-  
+
   /* how many bins should be used for cur_halo */
   *nbins   = (int) (6.2*(log10((double)halo.npart))-3.5);
   *nbins  *= AHF_NBIN_MULTIPLIER;
   *nbins   = MAX(2,*nbins);
   binpart  = (double)(halo.npart-1)/(double)*nbins;
-  
+
   /* halo position in AMIGA units */
   Xc = halo.pos.x;
   Yc = halo.pos.y;
   Zc = halo.pos.z;
-  
+
   /* minimum distance: we are not using the innermost particle but move out to 1/10 of AHF_MINPART */
 //  npart = 0;
 //  while(npart < halo.npart && npart < (int)((double)simu.AHF_MINPART/10.))
@@ -287,8 +287,8 @@ void binning_parameter(HALO halo, int *nbins, double *dist_min, double *dist_max
 //  if(dY > 0.5) dY = 1.0-dY;
 //  if(dZ > 0.5) dZ = 1.0-dZ;
 //  *dist_min  = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
-  
-  
+
+
   /* minimum distance: search for first particle with dist != 0 */
   npart     = (long)floor(((double)simu.AHF_MINPART/10.)+0.5);
   *dist_min = -1.0;
@@ -301,10 +301,13 @@ void binning_parameter(HALO halo, int *nbins, double *dist_min, double *dist_max
     if(dX > 0.5) dX = 1.0-dX;
     if(dY > 0.5) dY = 1.0-dY;
     if(dZ > 0.5) dZ = 1.0-dZ;
+    dX *= simu.anifac[0];
+    dY *= simu.anifac[1];
+    dZ *= simu.anifac[2];
     *dist_min  = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
     npart++;
    }
-  
+
   /* maximum distance */
   cur_part = global.fst_part + halo.ipart[halo.npart-1];
   dX = fabs(cur_part->pos[X] - Xc);
@@ -313,8 +316,11 @@ void binning_parameter(HALO halo, int *nbins, double *dist_min, double *dist_max
   if(dX > 0.5) dX = 1.0-dX;
   if(dY > 0.5) dY = 1.0-dY;
   if(dZ > 0.5) dZ = 1.0-dZ;
+  dX *= simu.anifac[0];
+  dY *= simu.anifac[1];
+  dZ *= simu.anifac[2];
   *dist_max  = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
-  
+
   /* try to capture the strange instance that half of the particles are right in the centre */
   if(*dist_min < MACHINE_ZERO) {
     *dist_min = *dist_max/2.;
@@ -323,7 +329,7 @@ void binning_parameter(HALO halo, int *nbins, double *dist_min, double *dist_max
 
 
 /*==============================================================================
- * read AMIGA header 
+ * read AMIGA header
  *==============================================================================*/
 void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
 {
@@ -331,7 +337,7 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
    int       idummy;
    long      ldummy;
    long long lldummy;
-      
+
 #ifdef AMIGA_ONE_FORMAT
    fread(&one, sizeof(int), 1, infile);
    if(one != 1)
@@ -362,18 +368,18 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
       fprintf(stderr," => start reading AMIGA header ... ");
      }
    machine_sizeof_long = sizeof(long);
-   
+
    if(machine_sizeof_long != file_sizeof_long)
       fprintf(stderr,"(sizeof(long) mismatch: %d vs. %d!) ",machine_sizeof_long,file_sizeof_long);
 #endif
-   
+
    if(*SWAPBYTES == TRUE || machine_sizeof_long != file_sizeof_long)
      {
       /* read in IO header */
       ReadChars(infile,io->header.header,HEADERSTRING);
       ReadInt(infile,&(io->header.multi_mass),*SWAPBYTES);
       ReadInt(infile,&(io->header.double_precision),*SWAPBYTES);
-      
+
       /* read 2x long unsigned */
       if(machine_sizeof_long == 8 && file_sizeof_long == 4)
         {
@@ -403,7 +409,7 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
                  machine_sizeof_long, file_sizeof_long);
          exit(0);
         }
-      
+
       ReadDouble(infile,&(io->header.no_vpart),*SWAPBYTES);
       ReadDouble(infile,&(io->header.timestep),*SWAPBYTES);
       ReadInt(infile,&(io->header.no_timestep),*SWAPBYTES);
@@ -423,7 +429,7 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
       ReadDouble(infile,&(io->header.U_current),*SWAPBYTES);
       ReadDouble(infile,&(io->header.Eintegral),*SWAPBYTES);
       ReadDouble(infile,&(io->header.Econst),*SWAPBYTES);
-      
+
       ReadDouble(infile,&(io->header.paramNSTEPS),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramNGRID_DOM),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramNth_dom),*SWAPBYTES);
@@ -435,13 +441,13 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
       ReadDouble(infile,&(io->header.paramMAX_L1DIM),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramDOMSWEEPS),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramREFSWEEPS),*SWAPBYTES);
-      
+
       ReadDouble(infile,&(io->header.paramAHF_MINPART),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramAHF_VTUNE),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramAHF_RISE),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramAHF_SLOPE),*SWAPBYTES);
       ReadDouble(infile,&(io->header.paramAHF_MAXNRISE),*SWAPBYTES);
-      
+
       ReadDouble(infile,&(io->header.min_weight),*SWAPBYTES);
       ReadDouble(infile,&(io->header.max_weight),*SWAPBYTES);
       ReadDouble(infile,&(io->header.t_unit),*SWAPBYTES);
@@ -450,12 +456,12 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
       ReadDouble(infile,&(io->header.param_dummy6),*SWAPBYTES);
       ReadDouble(infile,&(io->header.param_dummy7),*SWAPBYTES);
       ReadDouble(infile,&(io->header.param_dummy8),*SWAPBYTES);
-      
+
       ReadDouble(infile,&(io->header.version),*SWAPBYTES);
       ReadInt(infile,&(io->header.build),*SWAPBYTES);
       if(machine_sizeof_long == 4 && file_sizeof_long == 8)
          ReadInt(infile,&idummy,*SWAPBYTES);
-      
+
       ReadDouble(infile,&(io->header.omegab),*SWAPBYTES);
       ReadDouble(infile,&(io->header.gamma), *SWAPBYTES);
       ReadDouble(infile,&(io->header.H_frac),*SWAPBYTES);
@@ -484,7 +490,7 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
         {
          ReadChars(infile,io->header.dummy,FILLHEADER);
         }
-     } 
+     }
    else /* SWAPBYTES */
      {
       /* read header as complete structure */
@@ -509,77 +515,77 @@ void read_amiga_header(FILE *infile, info_io *io, int *SWAPBYTES)
 void get_c2fslope(double func[3][3][3], double slope[NDIM])
 {
    double slope_left, slope_right;
-   
+
    /* not that the spacing of the sampling of func is 1 */
-   
+
 #ifdef C2F_MIDCENTRE_NODELIMITER
-   
+
    /* mid-centred slope (no delimiter!) */
    slope[X] = (func[1][1][2] - func[1][1][0]) / 2.;
    slope[Y] = (func[1][2][1] - func[1][0][1]) / 2.;
    slope[Z] = (func[2][1][1] - func[0][1][1]) / 2.;
-   
+
 #endif /* C2F_MIDCENTRE_NODELIMITER */
-   
+
 #ifdef C2F_MIDCENTRE
-   
+
    /* mide-centred slope */
    slope[X] = (func[1][1][2] - func[1][1][0]) / 2.;
    slope[Y] = (func[1][2][1] - func[1][0][1]) / 2.;
    slope[Z] = (func[2][1][1] - func[0][1][1]) / 2.;
-   
+
    /* delimit the slope */
-   
+
    slope_left  = func[1][1][1] - func[1][1][0];
    slope_right = func[1][1][2] - func[1][1][1];
-   
+
    if(slope_left*slope_right < 0.)
       slope[X] = 0.0;
-   
+
    slope_left  = func[1][1][1] - func[1][0][1];
    slope_right = func[1][2][1] - func[1][1][1];
-   
+
    if(slope_left*slope_right < 0.)
       slope[Y] = 0.0;
-   
+
    slope_left  = func[1][1][1] - func[0][1][1];
    slope_right = func[2][1][1] - func[1][1][1];
-   
+
    if(slope_left*slope_right < 0.)
       slope[Z] = 0.0;
-   
+
 #endif /* C2F_MIDCENTRE */
-   
+
 #ifdef C2F_REDUCED
-   
+
    /* delimit the slope */
-   
+
    slope[X] = 0.0;
    slope[Y] = 0.0;
    slope[Z] = 0.0;
-   
+
    slope_left  = func[1][1][1] - func[1][1][0];
    slope_right = func[1][1][2] - func[1][1][1];
-   
+
    if(slope_left*slope_right > MACHINE_ZERO)
       slope[X] = 2*slope_left*slope_right / (slope_left+slope_right);
-   
+
    slope_left  = func[1][1][1] - func[1][0][1];
    slope_right = func[1][2][1] - func[1][1][1];
-   
+
    if(slope_left*slope_right > MACHINE_ZERO)
       slope[Y] = 2*slope_left*slope_right / (slope_left+slope_right);
-   
+
    slope_left  = func[1][1][1] - func[0][1][1];
    slope_right = func[2][1][1] - func[1][1][1];
-   
+
    if(slope_left*slope_right > MACHINE_ZERO)
       slope[Z] = 2*slope_left*slope_right / (slope_left+slope_right);
-   
+
 #endif /* C2F_REDUCED */
-   
+
 }
-  
+
 
 /*========================================================================
  * determine...
@@ -611,7 +617,7 @@ double init_header_masses()
    partptr  cur_part;
    double   most_common_weight, med_weight, med_norm;
    double   npart, inv_mean_dens, pmass;
-   
+
    fprintf(stderr,"     init_header_masses():\n");
 
 #ifdef MOST_COMMOM_WEIGHT_MANUAL
@@ -635,12 +641,12 @@ double init_header_masses()
   med_weight         = most_common_weight;
 
 #else // MOST_COMMOM_WEIGHT_MANUAL
-  
+
 #ifdef MULTIMASS
    no_species             = 1;
    wspecies               = (double*)calloc(no_species, sizeof(double));
    nspecies               = (long*)  calloc(no_species, sizeof(long));
-   
+
    /* we determine particle weights in units of first particle mass */
    pmass                  = io.fst_part->weight;
    min_weight             = 1.0;
@@ -648,15 +654,15 @@ double init_header_masses()
    no_vpart               = 1.0;
    wspecies[no_species-1] = 1.0;
    nspecies[no_species-1] = 1;
-   
+
    /* for Kahan summation of no_vpart */
    C = 0.0;
-   
+
    for(cur_part=io.fst_part+1; cur_part<io.fst_part+io.no_part; cur_part++)
      {
       /* compare particle weight in units of first particle mass */
       cur_weight  = cur_part->weight/pmass;
-             
+
       /* no_vpart += cur_weight ala Kahan summation */
       K = cur_weight-C;
       T = no_vpart + K;
@@ -672,14 +678,14 @@ double init_header_masses()
             nspecies[ispecies] += 1;
            }
         }
-      
+
       if(old_species == FALSE)
         {
          no_species++;
-          
+
          if(cur_weight > max_weight) max_weight = cur_weight;
          if(cur_weight < min_weight) min_weight = cur_weight;
-         
+
          wspecies               = (double*) realloc(wspecies, no_species*sizeof(double));
          nspecies               = (long*)   realloc(nspecies, no_species*sizeof(long));
 
@@ -687,7 +693,7 @@ double init_header_masses()
          nspecies[no_species-1] = 1;
         }
      }
-   
+
    fprintf(stderr,"     -> the following species have been found...\n");
    med_weight = 0.0;
    med_norm = 0.0;
@@ -699,8 +705,8 @@ double init_header_masses()
      }
    med_weight /= med_norm;
    fprintf(stderr,"\n");
-   
-   
+
+
    /* determine most common particle weight */
    imax = 0;
    nmax = nspecies[0];
@@ -714,11 +720,11 @@ double init_header_masses()
      }
    most_common_weight = wspecies[imax];
 
-   free(wspecies); 
-   free(nspecies);    
-   
+   free(wspecies);
+   free(nspecies);
+
 #else /* MULTIMASS */
-   
+
 #ifdef NO_EXPANSION
    fprintf(stderr,"     YOU ARE USING A NON-COSMOLOGICAL SETTING WITHOUT PROVIDING PARTICLE MASSES\n");
    fprintf(stderr,"      -> not implemented yet...exiting\n");
@@ -728,7 +734,7 @@ double init_header_masses()
    npart                  = (double)io.no_part;
    inv_mean_dens          = pow3(io.header.boxsize)/npart;
    pmass                  = io.header.omega0*rhoc0*inv_mean_dens;
-   
+
    /* these values are in internal units */
    no_species             = 1;
    no_vpart               = npart;
@@ -741,14 +747,14 @@ double init_header_masses()
    fprintf(stderr,"     you are using a cosmological setting without providing particle masses\n");
    fprintf(stderr,"      -> will use pmass = %16.8g as particle mass\n\n",pmass);
 #endif /* NO_EXPANSION */
-   
+
 #endif /* MULTIMASS */
-   
-   
+
+
 #endif // MOST_COMMOM_WEIGHT_MANUAL
-  
-   
-   
+
+
+
    /* dump no_vpart, no_species, min_weight, and max_weight */
    fprintf(stderr,"     no_species          = %16d\n",             no_species);
    fprintf(stderr,"     pmass               = %16.8g  Msun/h (%16.8g)\n",               pmass, io.header.pmass);
@@ -757,13 +763,13 @@ double init_header_masses()
    fprintf(stderr,"     min_weight          = %16.8g  Msun/h\n",   min_weight         * pmass);
    fprintf(stderr,"     max_weight          = %16.8g  Msun/h\n",   max_weight         * pmass);
    fprintf(stderr,"     med_weight          = %16.8g  Msun/h\n\n", med_weight         * pmass);
-   
+
    /* store newly calculated values */
    io.header.no_species = no_species;
    io.header.no_vpart   = no_vpart   * pmass;
    io.header.min_weight = min_weight * pmass;    // these values are in Msun/h
    io.header.max_weight = max_weight * pmass;
-  
+
    // TODO: what is the right choice for med_weight anyways?!
    io.header.med_weight = med_weight * pmass; //most_common_weight * pmass;
 
@@ -782,7 +788,7 @@ void ic_unit_conversion()
    double        x_fac, v_fac, m_fac;
    double        xmin, xmax, ymin, ymax, zmin, zmax;
    double        rho_mean;
-   
+
    fprintf(stderr,"\n=================================================================\n");
    fprintf(stderr,"                    ic_unit_conversion()\n");
    fprintf(stderr,"=================================================================\n");
@@ -794,25 +800,25 @@ void ic_unit_conversion()
    fprintf(stderr," ------------------------------------\n");
    xmax = -1E40; ymax = -1E40; zmax = -1E40;
    xmin = +1E40; ymin = +1E40; zmin = +1E40;
-   
+
    /* there is no MIN,MAX reduction for OpenMP in C :-( */
    for(cur_part=io.fst_part; cur_part<io.fst_part+io.no_part; cur_part++)
      {
       if(cur_part->pos[X] > xmax) xmax = cur_part->pos[X];
       if(cur_part->pos[Y] > ymax) ymax = cur_part->pos[Y];
       if(cur_part->pos[Z] > zmax) zmax = cur_part->pos[Z];
-      
+
       if(cur_part->pos[X] < xmin) xmin = cur_part->pos[X];
       if(cur_part->pos[Y] < ymin) ymin = cur_part->pos[Y];
       if(cur_part->pos[Z] < zmin) zmin = cur_part->pos[Z];
      }
-   
-   if(xmin >= 0.0               && ymin >= 0.0               && zmin >= 0.0 && 
+
+   if(xmin >= 0.0               && ymin >= 0.0               && zmin >= 0.0 &&
       xmax <= io.header.boxsize && ymax <= io.header.boxsize && zmax <= io.header.boxsize)
      {
       fprintf(stderr,"   -> everything's fine!\n");
      }
-   
+
    /* negative coordinates? */
    if(xmin < 0.0 || ymin < 0.0 || zmin < 0.0)
      {
@@ -848,7 +854,7 @@ void ic_unit_conversion()
          exit(0);
         }
      }
-   
+
    /* coordinates exceeding boxsize limit? */
    if(xmax > io.header.boxsize || ymax > io.header.boxsize || zmax > io.header.boxsize)
      {
@@ -856,15 +862,15 @@ void ic_unit_conversion()
       fprintf(stderr,"      boxsize = %16.8g\n", io.header.boxsize);
       fprintf(stderr,"      min     = %16.8g    %16.8g    %16.8g\n",xmin,ymin,zmin);
       fprintf(stderr,"      max     = %16.8g    %16.8g    %16.8g\n",xmax,ymax,zmax);
-      
+
       fprintf(stderr,"      not fixed yet...exiting\n");
       exit(0);
      }
-   
-   
-   
-   
-   
+
+
+
+
+
    /*==================================================================
     * 2. DETERMINE MOST APPROPRIATE MASS UNIT
     *==================================================================*/
@@ -878,17 +884,17 @@ void ic_unit_conversion()
 #ifdef MANUAL_PMASS
    io.header.pmass = 42570.70209705;   // set the mass unit to whatever you fancy...
 #endif
-   
+
    /* AMIGA expects these values to be in internal units! */
    io.header.no_vpart   /= io.header.pmass;
    io.header.min_weight /= io.header.pmass;
    io.header.max_weight /= io.header.pmass;
    io.header.med_weight /= io.header.pmass;
-   
+
    fprintf(stderr,"   -> will use %g Msun/h as mass unit for AMIGA\n",io.header.pmass);
 
-   
-   
+
+
    /*==================================================================
     * 3. CHOOSE TIME UNIT
     *==================================================================*/
@@ -898,25 +904,25 @@ void ic_unit_conversion()
    rho_mean         = io.header.no_vpart*io.header.pmass/pow3(io.header.boxsize);
    io.header.t_unit = 1./(4.*PI*Grav*rho_mean);
    io.header.t_unit = sqrt(io.header.t_unit);
-   
+
    fprintf(stderr,"   -> non-cosmological setup, will use %16.8g as time unit for AMIGA\n",io.header.t_unit);
 #else
    io.header.t_unit = 1./H0;
 
    fprintf(stderr,"   -> cosmological setup, will use 1/H0 = %g as time unit for AMIGA\n",io.header.t_unit);
 #endif
-   
-   
-   
-   
-   
+
+
+
+
+
    /*==================================================================
     *                        UNIT CONVERSION
     *==================================================================*/
    x_fac = 1./io.header.boxsize;
    v_fac = io.header.a_current*io.header.t_unit/io.header.boxsize;
    m_fac = 1./io.header.pmass;
-   
+
 #ifdef WITH_OPENMP
 #pragma omp parallel private(cur_part) shared(x_fac, v_fac, m_fac, io)
 #pragma omp for schedule(static)
@@ -937,7 +943,7 @@ void ic_unit_conversion()
    fprintf(stderr,"=================================================================\n");
    fprintf(stderr,"                finished ic_unit_conversion()\n");
    fprintf(stderr,"=================================================================\n");
-   
+
 }
 
 /*========================================================================
@@ -947,9 +953,9 @@ void ic_unit_conversion()
 void sanity_check()
 {
    double pmass, rho_mean;
-   
+
    fprintf(stderr," => performing sanity check of header information:\n");
-   
+
    /* dump AMIGA header (*before* reading particles) */
    fprintf(stderr,"  io.header (as read from input file):\n");
    fprintf(stderr,"  ------------------------------------\n");
@@ -971,7 +977,7 @@ void sanity_check()
    fprintf(stderr,"   header.boxsize               = %g\n",io.header.boxsize);
    fprintf(stderr,"   header.omega0                = %g\n",io.header.omega0);
    fprintf(stderr,"   header.omegab                = %g\n",io.header.omegab);
-   fprintf(stderr,"   header.lambda0               = %g\n",io.header.lambda0);   
+   fprintf(stderr,"   header.lambda0               = %g\n",io.header.lambda0);
    fprintf(stderr,"   header.gamma                 = %g\n",io.header.gamma);
    fprintf(stderr,"   header.H_frac                = %g\n",io.header.H_frac);
    fprintf(stderr,"   header.T_init                = %g\n",io.header.T_init);
@@ -986,7 +992,7 @@ void sanity_check()
    fprintf(stderr,"   header.Eintegral             = %g\n",io.header.Eintegral);
    fprintf(stderr,"   header.Econst                = %g\n",io.header.Econst);
    fprintf(stderr,"   header.paramNSTEPS           = %g\n",io.header.paramNSTEPS);
-   fprintf(stderr,"   header.paramNGRID_DOM        = %g\n",io.header.paramNGRID_DOM);   
+   fprintf(stderr,"   header.paramNGRID_DOM        = %g\n",io.header.paramNGRID_DOM);
    fprintf(stderr,"   header.paramNth_dom          = %g\n",io.header.paramNth_dom);
    fprintf(stderr,"   header.paramNth_ref          = %g\n",io.header.paramNth_ref);
    fprintf(stderr,"   header.paramE_UPDATE         = %g\n",io.header.paramE_UPDATE);
@@ -1001,7 +1007,7 @@ void sanity_check()
    fprintf(stderr,"   header.paramAHF_RISE         = %g\n",io.header.paramAHF_RISE);
    fprintf(stderr,"   header.paramAHF_SLOPE        = %g\n",io.header.paramAHF_SLOPE);
    fprintf(stderr,"   header.paramAHF_MAXNRISE     = %g\n",io.header.paramAHF_MAXNRISE);
-   
+
    /*=========
     *  UNITS
     *=========*/
@@ -1009,7 +1015,7 @@ void sanity_check()
    if(fabs(io.header.pmass) < ZERO)
      {
       fprintf(stderr," o mass unit not set  ");
-      
+
 #ifdef NO_EXPANSION
       fprintf(stderr,"-> non-cosmological setup ... exiting!\n");
       exit(0);
@@ -1019,12 +1025,12 @@ void sanity_check()
       fprintf(stderr,"-> using cosmological value pmass = %g\n",io.header.pmass);
 #endif
      }
-   
+
    /* check time unit */
    if(fabs(io.header.t_unit) < ZERO)
      {
       fprintf(stderr," o time unit not set  ");
-      
+
 #ifdef NO_EXPANSION
       rho_mean         = io.header.no_vpart*io.header.pmass/pow3(io.header.boxsize);
       io.header.t_unit = 1./(4.*PI*Grav*rho_mean);
@@ -1032,58 +1038,58 @@ void sanity_check()
       fprintf(stderr,"-> using non-cosmological value t_unit = %g\n",io.header.t_unit);
 #else
       /* we brute force use the cosmological setting! */
-      io.header.t_unit = 1./H0;   
+      io.header.t_unit = 1./H0;
       fprintf(stderr,"-> using cosmological value 1/H0  = %g\n",io.header.t_unit);
 #endif
      }
-   
+
 
    /*====================
     *  io.header masses
     *====================*/
-   if(fabs(io.header.no_vpart)   < ZERO || 
-      fabs(io.header.no_species) < ZERO || 
-      fabs(io.header.min_weight) < ZERO || 
+   if(fabs(io.header.no_vpart)   < ZERO ||
+      fabs(io.header.no_species) < ZERO ||
+      fabs(io.header.min_weight) < ZERO ||
       fabs(io.header.max_weight) < ZERO ||
       fabs(io.header.med_weight) < ZERO)
      {
       fprintf(stderr," o io.header masses not initialized ...\n");
-      
-      init_header_masses();   
-      
+
+      init_header_masses();
+
        /* init_header_masses() returns the values in physical units Msun/h */
       io.header.no_vpart   /= io.header.pmass;
       io.header.min_weight /= io.header.pmass;
       io.header.max_weight /= io.header.pmass;
       io.header.med_weight /= io.header.pmass;
      }
-   
 
-   
+
+
    /*=============
     *  MULTIMASS
     *=============*/
 #ifndef MULTIMASS
    if(io.header.multi_mass == 1)
      {
-      fprintf(stderr,"\n=================================================================\n");      
-      fprintf(stderr,"      your are trying to run a multi-mass simulation:\n");      
+      fprintf(stderr,"\n=================================================================\n");
+      fprintf(stderr,"      your are trying to run a multi-mass simulation:\n");
       fprintf(stderr,"          please recompile AMIGA with -DMULTIMASS\n");
-      fprintf(stderr,"=================================================================\n");  
+      fprintf(stderr,"=================================================================\n");
       exit(0);
      }
 #endif
 #ifdef MULTIMASS
    if(io.header.multi_mass == 0)
      {
-      fprintf(stderr,"\n=================================================================\n");      
-      fprintf(stderr,"     your are trying to run a sinlge-mass simulation:\n");      
+      fprintf(stderr,"\n=================================================================\n");
+      fprintf(stderr,"     your are trying to run a sinlge-mass simulation:\n");
       fprintf(stderr,"        please recompile AMIGA without -DMULTIMASS\n");
-      fprintf(stderr,"=================================================================\n");      
+      fprintf(stderr,"=================================================================\n");
       exit(0);
      }
 #endif
-   
+
    /*============
     *   DOUBLE
     *============*/
@@ -1091,30 +1097,30 @@ void sanity_check()
    if(io.header.double_precision != 1)
      {
       fprintf(stderr,"\n input file is single precision but simulation will be run in double precision\n");
-      fprintf(stderr,"   => will upcast\n");      
+      fprintf(stderr,"   => will upcast\n");
      }
-   
+
    io.header.double_precision = 1;
 #else
    if(io.header.double_precision == 1)
      {
       fprintf(stderr,"\n input file is double precision but simulation will be run in single precision\n");
-      fprintf(stderr,"   => will downcast\n");      
+      fprintf(stderr,"   => will downcast\n");
      }
-   
+
    io.header.double_precision = 0;
 #endif
-   
+
    fprintf(stderr," <= finished sanity_check()\n");
 }
 
 
 /**
  * cmp_sfckey_part: compares the sfc keys of two particles, used
- * for qsort 
+ * for qsort
  */
 extern int
-cmp_sfckey_part(const void *p1, const void *p2) 
+cmp_sfckey_part(const void *p1, const void *p2)
 {
 	if (((partptr)p1)->sfckey < ((partptr)p2)->sfckey)
 		return -1;
@@ -1131,28 +1137,28 @@ cmp_sfckey_part(const void *p1, const void *p2)
  *==============================================================================*/
 void write_logfile(double timecounter, double timestep, int no_timestep)
 {
-  
+
   gridls *for_grid;          /* for looping over all grids          */
   double  RAM;               /* how much RAM has been used                    */
   double  PDgrowth;
   long    dom_nopart;        /* number of particles linked to domain grid     */
   double  da_a;
   double  total_time_step;
-  
+
   /* write current timestep into logfile */
   fprintf(io.logfile, "\n");
   fprintf(io.logfile, "supercomoving T = %f\n", timecounter);
   fprintf(io.logfile, "scale factor  a = %f\n", calc_super_a(timecounter));
   fprintf(io.logfile, "redshift      z = %f\n", 1.0/calc_super_a(timecounter)-1.0);
   fflush(io.logfile);
-  
+
   /* reset time counter */
   grid_timing.potential = 0;
   grid_timing.density   = 0;
   grid_timing.DK        = 0;
   grid_timing.grid      = 0;
   grid_timing.hydro     = 0;
-  
+
   /* get number of particles attached to domain grid */
   if(global.fin_l1dim > global.dom_grid->l1dim)
    {
@@ -1160,14 +1166,14 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
     for(for_grid=(global.dom_grid+1); for_grid->l1dim<global.fin_l1dim; for_grid++)
       dom_nopart -= for_grid->size.no_part;
     dom_nopart -= for_grid->size.no_part;
-    
+
     global.dom_grid->size.no_part = dom_nopart;
    }
-  
+
   /* start accumulating RAM used during this step */
   RAM = simu.no_halos*sizeof(HALO) * bytes2GB;
-  
-  
+
+
   fprintf(io.logfile,"\n");
   fprintf(io.logfile,"grid information\n");
   fprintf(io.logfile,"----------------\n");
@@ -1187,14 +1193,14 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
             for_grid->time.hydro,
             for_grid->no_sweeps,
             for_grid->cur_resid);
-    
+
     grid_timing.potential += for_grid->time.potential;
     grid_timing.density   += for_grid->time.density;
     grid_timing.DK        += for_grid->time.DK;
     grid_timing.grid      += for_grid->time.grid;
     grid_timing.hydro     += for_grid->time.hydro;
     RAM                   += for_grid->size.no_nodes * global.bytes_node * bytes2GB;
-    
+
     for_grid->time.potential = 0;
     for_grid->time.density   = 0;
     for_grid->time.DK        = 0;
@@ -1204,7 +1210,7 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
   fflush(io.logfile);
   /* treat grid with for_grid->l1dim==global.fin_l1dim separately
    * in order to avoid incrementing for_grid++ too far!!! */
-  
+
   /* write grid information to logfile */
   /*-----------------------------------*/
   fprintf(io.logfile,"GRID %12ld: nodes=%12lu (%8.3g GB) npart=%12lu - TIME: pot=%6ld dens=%6ld grid=%6ld\n",
@@ -1214,21 +1220,21 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
           for_grid->time.potential,
           for_grid->time.density,
           for_grid->time.grid);
-  
+
   grid_timing.potential += for_grid->time.potential;
   grid_timing.density   += for_grid->time.density;
   grid_timing.DK        += for_grid->time.DK;
   grid_timing.grid      += for_grid->time.grid;
   grid_timing.hydro     += for_grid->time.hydro;
   RAM                   += for_grid->size.no_nodes * global.bytes_node * bytes2GB;
-  
+
   for_grid->time.potential = 0;
   for_grid->time.density   = 0;
   for_grid->time.DK        = 0;
   for_grid->time.grid      = 0;
-  for_grid->time.hydro     = 0;  
+  for_grid->time.hydro     = 0;
   fprintf(io.logfile, "                                                                                   %6ld      %6ld    %6ld\n", grid_timing.potential, grid_timing.density, grid_timing.grid);
-  
+
   /* write detailed breakdown of timing */
   /*------------------------------------*/
   fprintf(io.logfile,"detailed timing information (in sec.)\n");
@@ -1262,9 +1268,9 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
   fprintf(io.logfile,"      - spatialRef2halos            = %ld\n",timing.spatialRef2halos);
   fprintf(io.logfile,"      - ahf_halos_sfc_constructHalo = %ld\n",timing.ahf_halos_sfc_constructHalo);
   fprintf(io.logfile,"      - I/O                         = %ld\n",timing.ahf_io);
-  
+
   fflush(io.logfile);
-  
+
   /* write summary information */
   /*---------------------------*/
   /* finish logfile entries for this step... */
@@ -1278,14 +1284,14 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
                      PkSpectrum.time        )     /3600.;
   total_time_step   += timing.io/3600.;
   global.total_time += total_time_step;
-  
+
   /* add particles to RAM */
 #ifndef WITH_MPI
   RAM += global.no_part * global.bytes_part * bytes2GB;
 #else
   RAM += global_info.no_part * global.bytes_part * bytes2GB;
 #endif /* WITH_MPI */
-  
+
   fprintf(io.logfile,"\n");
   fprintf(io.logfile,"summary information\n");
   fprintf(io.logfile,"-------------------\n");
@@ -1302,9 +1308,9 @@ void write_logfile(double timecounter, double timestep, int no_timestep)
 	               (global_mpi.stop-global_mpi.start),
 	               (global_mpi.stop-global_mpi.start)/3600.);
 #	endif
-  
+
   fflush(io.logfile);
-  
+
   ahf.time        = 0;
   energy.time     = 0;
   PkSpectrum.time = 0;
@@ -1321,7 +1327,7 @@ void write_parameterfile()
   double dummy;
   char   param_file[MAXSTRING], dummyline[MAXSTRING];
   double a, a3, omega, lambda, ovlim, rho_crit, rho_b, rho_vir, Hubble;
-  
+
 #ifdef WITH_MPI
   /* make sure to only write one parameter file when running on multile CPUs */
   if(global_mpi.rank == 0)
@@ -1330,7 +1336,7 @@ void write_parameterfile()
      {
       strcpy(param_file, global_io.params->outfile_prefix);
       strcat(param_file,".parameter");
-      
+
 #ifdef RESTART_PARAMETER_FILE
       /* check if there is already a paramater file */
       if( (fpparam = fopen(param_file,"r")) != NULL)
@@ -1341,7 +1347,7 @@ void write_parameterfile()
         fprintf(stderr,"       writing parameter to %s instead!\n",param_file);
        }
 #endif
-      
+
       if( (fpparam = fopen(param_file,"w")) == NULL)
        {
         fprintf(io.logfile," NOTE: could not open %s to dump parameter\n",param_file);
@@ -1350,7 +1356,7 @@ void write_parameterfile()
        {
         /* write >>all<< relevant paramater to file */
         WRITEAHFLOGO(fpparam);
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"AHF related parameter:\n");
         fprintf(fpparam,"----------------------\n");
@@ -1370,7 +1376,7 @@ void write_parameterfile()
         fprintf(fpparam,"PDM                        \t\t%g\n",                       PDM);
         fprintf(fpparam,"PSTAR                      \t\t%g\n",                     PSTAR);
         fprintf(fpparam,"PDMbndry                   \t\t%g\n",                  PDMbndry);
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"simulation related values:\n");
         fprintf(fpparam,"--------------------------\n");
@@ -1392,7 +1398,7 @@ void write_parameterfile()
         fprintf(fpparam,"rho_vir(z)                 \t\t%g\n", rho_vir);
         fprintf(fpparam,"Delta_vir(z)               \t\t%g\n", ovlim);
         fprintf(fpparam,"Hubble(z)                  \t\t%g\n", Hubble);
-        
+
         if(fabs(simu.GADGET_m2Msunh) > ZERO)
          {
           fprintf(fpparam,"\n");
@@ -1471,7 +1477,7 @@ void write_parameterfile()
           fprintf(fpparam,"CUBEP3M_NODES_DIM             \t\t%g\n",       dummy);
           fclose(codeinfo);
          }
-       
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"general parameter:\n");
         fprintf(fpparam,"------------------\n");
@@ -1489,7 +1495,7 @@ void write_parameterfile()
         fprintf(fpparam,"ZERO                       \t\t%g\n",                      ZERO);
         fprintf(fpparam,"MACHINE_ZERO               \t\t%g\n",              MACHINE_ZERO);
         fprintf(fpparam,"MZERO                      \t\t%g\n",                     MZERO);
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"gravity solver related parameter:\n");
         fprintf(fpparam,"---------------------------------\n");
@@ -1499,7 +1505,7 @@ void write_parameterfile()
         fprintf(fpparam,"ETA                        \t\t%g\n",                       ETA);
         fprintf(fpparam,"CONVCRIT                   \t\t%g\n",                  CONVCRIT);
         fprintf(fpparam,"DOMCORRECT                 \t\t%g\n",                DOMCORRECT);
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"MPI related parameter:\n");
         fprintf(fpparam,"----------------------\n");
@@ -1507,7 +1513,7 @@ void write_parameterfile()
         fprintf(fpparam,"LOADBALANCE_DOMAIN_LEVEL   \t\t%d\n",             simu.lb_level);
         fprintf(fpparam,"MAX_SEND_PARTICLES         \t\t%d\n",        MAX_SEND_PARTICLES);
         fprintf(fpparam,"VERBOSITY                  \t\t%d\n",                 VERBOSITY);
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"physical constants:\n");
         fprintf(fpparam,"-------------------\n");
@@ -1519,7 +1525,7 @@ void write_parameterfile()
         fprintf(fpparam,"cH0                        \t\t%g\n",                       cH0);
         fprintf(fpparam,"kB_per_mp                  \t\t%g\n",                 kB_per_mp);
         fprintf(fpparam,"kBoltzman                  \t\t%g\n",                 kBoltzman);
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"*=====================*\n");
         fprintf(fpparam,"     DEFINEFLAGS:\n");
@@ -1767,7 +1773,7 @@ void write_parameterfile()
 #else
         fprintf(fpparam,"PARDAU_PARTS               \t\t0\n");
 #endif
-        
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"various flags:\n");
         fprintf(fpparam,"--------------\n");
@@ -1829,9 +1835,9 @@ void write_parameterfile()
 #else
         fprintf(fpparam,"NGP                        \t\t0\n");
 #endif
-        
-        
-        
+
+
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"gravity solver related flags:\n");
         fprintf(fpparam,"-----------------------------\n");
@@ -1855,10 +1861,10 @@ void write_parameterfile()
 #else
         fprintf(fpparam,"SWAP_XZ                    \t\t0\n");
 #endif
-        
-        
-        
-        
+
+
+
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"GADGET related flags:\n");
         fprintf(fpparam,"---------------------\n");
@@ -1887,8 +1893,8 @@ void write_parameterfile()
 #else
         fprintf(fpparam,"METALHACK                  \t\t0\n");
 #endif
-        
-        
+
+
         fprintf(fpparam,"\n");
         fprintf(fpparam,"misc. flags:\n");
         fprintf(fpparam,"------------\n");
@@ -1922,7 +1928,7 @@ void write_parameterfile()
 #else
         fprintf(fpparam,"AHFDEBUG                   \t\t0\n");
 #endif
-        
+
 #ifdef ART
         fprintf(fpparam,"ART                        \t\t1\n");
 #else
@@ -1958,14 +1964,14 @@ void write_parameterfile()
 #else
         fprintf(fpparam,"ASCII_ONLYPOSITIONS        \t\t0\n");
 #endif
-        
+
         fclose(fpparam);
        }
-      
-      
-     } 
-  
-}   
+
+
+     }
+
+}
 
 /*==============================================================================
  * small routine calculating cNFW according to Eq.(9) in Prada et al. (2012)
@@ -1980,13 +1986,13 @@ double cNFWroot(double c, double V2_ratio)
 double calc_cNFW(double V2_max, double V2_vir)
 {
   double V2_ratio, a, b, c, r1;
-  
+
   V2_ratio = V2_max/V2_vir;
-  
+
   /* we cannot find a root in these cases */
   if (V2_ratio <= 1 || V2_ratio > 5.9)
     return(-1);
-  
+
   /* the most simple bi-section root-finding method on intervall [2.2,100] */
   a=2.2;
   b=100;
@@ -1994,13 +2000,13 @@ double calc_cNFW(double V2_max, double V2_vir)
   while (b-a > 1e-3)
    {
     c = (a+b)/2;
-    
+
     if (cNFWroot(a, V2_ratio)*cNFWroot(c, V2_ratio) > 0)
       a = c;
     else
-      b = c;  
+      b = c;
    }
-  
+
 #ifdef NEW_cNFW
   a=2.0;
   b=100.0;
@@ -2016,7 +2022,7 @@ double calc_cNFW(double V2_max, double V2_vir)
 #endif
 
   c = (a+b)/2.0;
-  
+
   return(c);
 
 }
@@ -2027,47 +2033,47 @@ double calc_cNFW(double V2_max, double V2_vir)
 uint64_t getHaloID(HALO *halos, int i)
 {
   uint64_t ID;
-  
+
 #ifdef AHFmixHaloIDandSnapID
   uint64_t snapid, haloid;
-  
-  haloid = (uint64_t)i;  
+
+  haloid = (uint64_t)i;
   snapid = (uint64_t)simu.isnap;
-  
+
   /* combine */
   ID     = (snapid << 54) | haloid;
 #else
   HALO    *halo;
   uint64_t Nid, Xid, Yid, Zid;
   double   Xc,Yc,Zc;
-  
+
   /* access halo from halos[] array */
   halo = halos+i;
-  
+
   /* Nid shall be encoded in the first 4 bits  = left-shift by 60 */
   Nid = (uint64_t) log10(halo->npart);
   Nid = Nid << 60;
-  
+
   /* encode position using 20 bits each */
   Xc  = halo->pos.x;
   Xid = (uint64_t) (Xc*(double)(1LU<<20));
   Xid = Xid << 40;
-  
+
   Yc  = halo->pos.y;
   Yid = (uint64_t) (Yc*(double)(1LU<<20));
   Yid = Yid << 20;
-  
+
   Zc  = halo->pos.z;
   Zid = (uint64_t) (Zc*(double)(1LU<<20));
   Zid = Zid << 0;
-  
+
   /* combine all IDs into one single number */
   ID = Nid;
   ID = ID | Xid;
   ID = ID | Yid;
   ID = ID | Zid;
 #endif
-  
+
   return(ID);
 }
 
@@ -2077,9 +2083,9 @@ uint64_t getHaloID(HALO *halos, int i)
 uint64_t getSussing2013ID(int isnap, int ihalo)
 {
   uint64_t ID;
-  
+
   ID = (uint64_t) ( ((uint64_t)1e12)*isnap + (ihalo+1) );
-  
+
   return(ID);
 }
 
@@ -2094,9 +2100,9 @@ int check_gadgetversion(FILE *fp)
 {
   char string[MAXSTRING];
   int version;
-  
+
   rewind(fp);
-  
+
   GADGET_SKIP;
   fread(string,sizeof(char),4,fp);
   if(strncmp("HEAD",string,4) == 0)
@@ -2105,7 +2111,7 @@ int check_gadgetversion(FILE *fp)
     version = 1;
 
   rewind(fp);
-  
+
   return version;
 }
 
@@ -2116,17 +2122,17 @@ int check_gadgetswap(FILE *fp)
 {
   uint32_t bbound1, bbound2, tmp;
   int      swap;
-  
+
   rewind(fp);
-  
+
   GADGET_SKIP;
   bbound1 = blklen;
-  
+
   fseek(fp, (long)bbound1, SEEK_CUR);
-  
+
   GADGET_SKIP;
   bbound2 = blklen;
-  
+
   if (bbound1 == bbound2) {
     swap = 0;
   }
@@ -2134,8 +2140,8 @@ int check_gadgetswap(FILE *fp)
     swap = 1;
   }
   rewind(fp);
-  
-  
+
+
   return swap;
 }
 
@@ -2151,23 +2157,23 @@ int ptree_min_level(double Nthreshold)
   fprintf(stderr,"\nptree_min_level: determining minimum level for patch-tree:\n");
 #endif
   fprintf(io.logfile,"\nptree_min_level: determining minimum level for patch-tree:\n");
-  
+
   // cosmology related stuff
 	a        = global.a;
 	a3       = pow3(a);
 	omega    = calc_omega(a);
 	ovlim    = calc_virial(a);
   rho_vir  = a3 * calc_rho_vir(a); // comoving(!) density used to normalize densities
-  
+
   // get the number of the grid satisfying virial overdensity criterion
   refine_mass  = simu.pmass*simu.med_weight;
-  
-  
+
+
   // loop over all possible levels in the particle tree
   min_level = 0;
   max_level = (int)(log(global_io.params->NGRID_MAX)/log(2.0));
-  
-  
+
+
   for ( i=0; i <= max_level ; i++ )
    {
     fl1dim        = pow(2.0, (double)i);
@@ -2181,13 +2187,13 @@ int ptree_min_level(double Nthreshold)
     if ( refine_ovdens <  ovlim )
       min_level = i;
    }
- 
+
   // store maximum overdensity possible with current refinement hierarchy
   global.max_ovdens = refine_ovdens;
-  
+
   /* allow some leverage via arc/param.h */
   min_level += AHF_MIN_REF_OFFSET;
-  
+
   fprintf(io.logfile,"\n   Cosmology:\n",a);
   fprintf(io.logfile,"   ==========\n",a);
   fprintf(io.logfile,"    a                = %lf\n",a);
@@ -2200,7 +2206,7 @@ int ptree_min_level(double Nthreshold)
   fprintf(io.logfile,"    min_level        = %d\n",min_level);
   fprintf(io.logfile,"    max_level        = %d\n\n",max_level);
   fflush(io.logfile);
-  
+
   return(min_level);
 }
 

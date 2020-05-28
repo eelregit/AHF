@@ -149,6 +149,14 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
 
 	int32_t tmpInt;
 
+	/* Get the anisotropic scale factor ratios */
+	getFromIni(params->anifac, parse_ini_get_double,
+	           ini, "anifac_x", local_secName);
+	getFromIni(params->anifac+1, parse_ini_get_double,
+	           ini, "anifac_y", local_secName);
+	getFromIni(params->anifac+2, parse_ini_get_double,
+	           ini, "anifac_z", local_secName);
+
 	/* Get the input file name */
 	getFromIni(&(params->icfile_name), parse_ini_get_string,
 	           ini, "ic_filename", local_secName);
@@ -169,7 +177,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
 	/* Get the maximum grid size */
 	getFromIni(&(params->NGRID_MAX), parse_ini_get_int32,
 	           ini, "LgridMax", local_secName);
-  
+
 	/* Get the refinment criterion for the domain grid */
 	getFromIni(&(params->Nth_dom), parse_ini_get_double,
 	           ini, "NperDomCell", local_secName);
@@ -193,11 +201,11 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
 	/* Get the tune parameter for the escape velocity */
 	getFromIni(&(params->AHF_VTUNE), parse_ini_get_double,
 	           ini, "VescTune", local_secName);
-  
+
 	/* Get the maximum gather radius */
 	getFromIni(&(params->AHF_MINPART), parse_ini_get_int32,
 	           ini, "NminPerHalo", local_secName);
-  
+
 #ifdef WITH_MPI
 	/* Get the number of readers */
 	getFromIni(&(params->reader), parse_ini_get_uint32,
@@ -217,22 +225,22 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
 	getFromIni(&(params->lrsi_r_s), parse_ini_get_double,
 	           ini, "lrsi_r_s", local_secName);
 #endif
-  
+
 #if (defined AHFmixHaloIDandSnapID || defined SUSSING2013)
 	getFromIni(&(params->isnap), parse_ini_get_uint64,
 	           ini, "snapID", local_secName);
 #endif
-  
+
 #ifdef DARK_ENERGY
 	/* Get name of file containing the dark energy relevant tables */
 	getFromIni(&(params->defile_name), parse_ini_get_string,
 	           ini, "de_filename", local_secName);
 #endif
-  
-  
+
+
 
   /* read additional information for some input file formats and write the respective IO_FILE.info */
-  
+
   /*-----------------
    *     GADGET
    *-----------------*/
@@ -244,15 +252,15 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
     /* Get GADGET_LUNIT */
     getFromIni(&(params->GADGET_l2Mpch), parse_ini_get_double,
                ini, "GADGET_LUNIT", "GADGET");
-    
+
 #ifdef VERBOSE2
     fprintf(stderr,"GADGET_LUNIT       = %g\n",params->GADGET_l2Mpch);
     fprintf(stderr,"GADGET_MUNIT       = %g\n",params->GADGET_m2Msunh);
     fprintf(stderr,"\n");
 #endif
-    
+
     // nothing to write here as GADGET_stuff will be passed on ;-)
-    
+
    }
 
 #ifdef WITH_HDF5
@@ -267,18 +275,18 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
     /* Get GADGET_LUNIT */
     getFromIni(&(params->GIZMO_l2Mpch), parse_ini_get_double,
                ini, "GIZMO_LUNIT", "GIZMO");
-    
+
 #ifdef VERBOSE2
     fprintf(stderr,"GIZMO_LUNIT       = %g\n",params->GIZMO_l2Mpch);
     fprintf(stderr,"GIZMO_MUNIT       = %g\n",params->GIZMO_m2Msunh);
     fprintf(stderr,"\n");
 #endif
-    
+
     // nothing to write here as GIZMO_stuff will be passed on ;-)
-    
+
   }
 #endif // WITH_HDF5
-  
+
   /*-----------------
    *       ART
    *-----------------*/
@@ -286,12 +294,12 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
    {
     FILE   *fpout;
     double ART_BOXSIZE, ART_MUNIT;
-    
+
     getFromIni(&ART_BOXSIZE, parse_ini_get_double,
                ini, "ART_BOXSIZE", "ART");
     getFromIni(&ART_MUNIT, parse_ini_get_double,
                ini, "ART_MUNIT", "ART");
-    
+
 #ifdef VERBOSE
     fprintf(stderr,"ART_BOXSIZE       = %20.10lf\n",ART_BOXSIZE);
     fprintf(stderr,"ART_MUNIT         = %20.10lf\n",ART_MUNIT);
@@ -306,7 +314,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
        {
         fprintf(stderr,"Could not open art.info\nAborting\n");
         exit(0);
-       }    
+       }
       fprintf(fpout,"%20.10lf \t\t ART_BOXSIZE\n",ART_BOXSIZE);
       fprintf(fpout,"%20.10lf \t\t ART_MUNIT\n",ART_MUNIT);
       fclose(fpout);
@@ -314,7 +322,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
      }
 #endif
    }
-  
+
   /*-----------------
    *      TIPSY
    *-----------------*/
@@ -322,7 +330,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
    {
     FILE   *fpout;
     double TIPSY_BOXSIZE, TIPSY_MUNIT, TIPSY_VUNIT, TIPSY_EUNIT, TIPSY_OMEGA0, TIPSY_LAMBDA0;
-    
+
     getFromIni(&TIPSY_BOXSIZE, parse_ini_get_double,
                ini, "TIPSY_BOXSIZE", "TIPSY");
     getFromIni(&TIPSY_MUNIT, parse_ini_get_double,
@@ -335,7 +343,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
                ini, "TIPSY_OMEGA0", "TIPSY");
     getFromIni(&TIPSY_LAMBDA0, parse_ini_get_double,
                ini, "TIPSY_LAMBDA0", "TIPSY");
-    
+
 #ifdef VERBOSE
     fprintf(stderr,"TIPSY_OMEGA0      = %20.10lf\n",TIPSY_OMEGA0);
     fprintf(stderr,"TIPSY_LAMBDA0     = %20.10lf\n",TIPSY_LAMBDA0);
@@ -345,7 +353,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
     fprintf(stderr,"TIPSY_EUNIT       = %20.10lf\n",TIPSY_EUNIT);
     fprintf(stderr,"\n");
 #endif
-    
+
 #ifdef WITH_MPI
     if(global_mpi.rank == 0) // only the master should write the file
      {
@@ -354,7 +362,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
        {
         fprintf(stderr,"Could not open tipsy.info\nAborting\n");
         exit(0);
-       }    
+       }
       fprintf(fpout,"%20.10lf \t\t TIPSY_OMEGA0\n",TIPSY_OMEGA0);
       fprintf(fpout,"%20.10lf \t\t TIPSY_LAMBDA0\n",TIPSY_LAMBDA0);
       fprintf(fpout,"%20.10lf \t\t TIPSY_BOXSIZE\n",TIPSY_BOXSIZE);
@@ -375,7 +383,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
    {
     FILE   *fpout;
     double CUBEP3M_BOXSIZE, CUBEP3M_NGRID, CUBEP3M_NODES_DIM, CUBEP3M_OMEGA0, CUBEP3M_LAMBDA0;
-    
+
     getFromIni(&CUBEP3M_BOXSIZE, parse_ini_get_double,
                ini, "CUBEP3M_BOXSIZE", "CUBEP3M");
     getFromIni(&CUBEP3M_NGRID, parse_ini_get_double,
@@ -386,7 +394,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
                ini, "CUBEP3M_OMEGA0", "CUBEP3M");
     getFromIni(&CUBEP3M_LAMBDA0, parse_ini_get_double,
                ini, "CUBEP3M_LAMBDA0", "CUBEP3M");
-    
+
 #ifdef VERBOSE
     fprintf(stderr,"CUBEP3M_OMEGA0      = %20.10lf\n",CUBEP3M_OMEGA0);
     fprintf(stderr,"CUBEP3M_LAMBDA0     = %20.10lf\n",CUBEP3M_LAMBDA0);
@@ -395,7 +403,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
     fprintf(stderr,"CUBEP3M_NODES_DIM   = %20.10lf\n",CUBEP3M_NODES_DIM);
     fprintf(stderr,"\n");
 #endif
-    
+
 #ifdef WITH_MPI
     if(global_mpi.rank == 0) // only the master should write the file
      {
@@ -404,7 +412,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
        {
         fprintf(stderr,"Could not open cubep3m.info\nAborting\n");
         exit(0);
-       }    
+       }
       fprintf(fpout,"%20.10lf \t\t CUBEP3M_OMEGA0\n",CUBEP3M_OMEGA0);
       fprintf(fpout,"%20.10lf \t\t CUBEP3M_LAMBDA0\n",CUBEP3M_LAMBDA0);
       fprintf(fpout,"%20.10lf \t\t CUBEP3M_BOXSIZE\n",CUBEP3M_BOXSIZE);
@@ -415,7 +423,7 @@ local_readRequired(io_parameter_t params, parse_ini_t ini)
      }
 #endif
    }
-  
+
 } /* local_readRequired */
 
 static void
@@ -427,10 +435,11 @@ local_printStruct(FILE *f, const io_parameter_t params)
 #endif
     assert(f != NULL);
     assert(params != NULL);
-    
+
     fprintf(f, "\n");
     fprintf(f, "These are the input parameters you provided, please check them carefully again:\n");
     fprintf(f, "===============================================================================\n");
+    fprintf(f, "anifac            = %f %f %f\n", params->anifac[0], params->anifac[1], params->anifac[2]);
     fprintf(f, "ic_filename       = %s\n", params->icfile_name);
     fprintf(f, "ic_filetype       = %i\n", (int)(params->ic_filetype));
     fprintf(f, "outfile_prefix    = %s\n", params->outfile_prefix);

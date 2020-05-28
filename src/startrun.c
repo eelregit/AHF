@@ -70,13 +70,13 @@ extern void startrun(char *paramfile, double *timecounter, double *timestep, int
   /* Now set up the logging */
 	local_startrunLog();
 	io_logging_part(global_io.log, "Setting up the run");
-  
+
 	/* FIXME Do some glueing FIXME */
 	io.logfile = global_io.log->logfile;
-  
+
 	/* Open the file */
 	local_startrunFopen();
-  
+
 	/* Set global_info */
 	global_info.fst_part = NULL;
 	global_info.no_part = UINT64_C(0);
@@ -88,10 +88,10 @@ extern void startrun(char *paramfile, double *timecounter, double *timestep, int
 	                                      global_io.params->lb_level,
 	                                      global_mpi.size);
 #	endif
-  
+
 	/* Now read the initial conditions (sets the rest of global_info) */
 	local_startrunRead();
-  
+
 	/* Load the dark energy tables for interpolation if DE is defined */
 #ifdef DARK_ENERGY
 	read_dark_energy_table(global_io.params->defile_name);
@@ -99,29 +99,29 @@ extern void startrun(char *paramfile, double *timecounter, double *timestep, int
 
 	/* Set the simulation parameters */
 	local_startrunSimparams();
-  
+
 	/* Now set the returned simulation counter stuff thingies */
 	local_startrunRetset(timecounter, timestep, no_first_timestep);
-  
+
 	/* Set global time counter */
-	global.super_t = *timecounter;                      
-	global.a       = calc_super_a(global.super_t);   
-	global.t       = calc_t(global.a);            
+	global.super_t = *timecounter;
+	global.a       = calc_super_a(global.super_t);
+	global.t       = calc_t(global.a);
 	global.z       = 1./global.a - 1.;
-  
+
 #ifdef NO_EXPANSION
   global.a       = 1.0;
   global.t       = *timecounter;
   global.z       = 0.0;
   global.super_t = -1.;
 #endif
-  
+
 	/* And now lets be so nice and close the file... */
 	io_logging_section(global_io.log, "Tidying");
 	io_file_close(global_io.log, &(global_io.file));
 
 
-  
+
   write_parameterfile();
 
 #ifdef EXTRAE_API_USAGE
@@ -133,10 +133,10 @@ extern void startrun(char *paramfile, double *timecounter, double *timestep, int
 
 extern void
 stoprun(void)
-{	
+{
 	io_parameter_del(&(global_io.params));
 	io_logging_stop(&(global_io.log));
-  
+
 	return;
 }
 
@@ -147,7 +147,7 @@ local_startrunParams(char *paramfile)
 	if (global_io.params == NULL) {
 		common_terminate(EXIT_FAILURE);
 	}
-  
+
 	return;
 }
 
@@ -157,17 +157,18 @@ local_startrunLog(void)
 #ifdef WITH_OPENMP
   int nthreads, ncpus, tid;
 #endif
-  
+
 	global_io.log = io_logging_start(global_io.params->outfile_prefix, INT32_C(VERBOSITY), IO_LOGGING_FLAGS_DUPLICATE_CRITICAL);
 	if (global_io.log == NULL) {
 		io_parameter_del(&(global_io.params));
 		common_terminate(EXIT_FAILURE);
 	}
-  
+
 	/* And since we can log now, log a bit. */
 	io_logging_hello(global_io.log, VERSION, BUILD);
 	io_logging_msg(global_io.log, INT32_C(2), " User Input:");
 	io_logging_msg(global_io.log, INT32_C(2), "=============");
+	io_logging_msg(global_io.log, INT32_C(2), "anifac            = %g %g %g", global_io.params->anifac[0], global_io.params->anifac[1], global_io.params->anifac[2]);
 	io_logging_msg(global_io.log, INT32_C(2), "ic_filename       = %s (%s, %i)", global_io.params->icfile_name, io_file_typestr(global_io.params->ic_filetype),(int)(global_io.params->ic_filetype));
 	io_logging_msg(global_io.log, INT32_C(2), "outfile_prefix    = %s", global_io.params->outfile_prefix);
 	io_logging_msg(global_io.log, INT32_C(2), "LgridDomain       = %i", global_io.params->NGRID_DOM);
@@ -190,7 +191,7 @@ local_startrunLog(void)
 #ifdef DARK_ENERGY
 	io_logging_msg(global_io.log, INT32_C(2), "DarkEnergyFile    = %s", global_io.params->defile_name);
 #endif
-  
+
 #ifdef WITH_OPENMP
 	io_logging_msg(global_io.log, INT32_C(2), "\n\n OpenMP Info:");
 	io_logging_msg(global_io.log, INT32_C(2), "==============");
@@ -198,7 +199,7 @@ local_startrunLog(void)
   {
    /* Obtain thread number */
    tid = omp_get_thread_num();
-   
+
    /* Only master thread does this */
    if (tid == 0)
     {
@@ -209,7 +210,7 @@ local_startrunLog(void)
     }
   }
 #endif /* WITH_OPENMP */
-  
+
 	return;
 }
 
@@ -217,7 +218,7 @@ static void
 local_startrunFopen(void)
 {
 	io_logging_section(global_io.log, "Opening the data file");
-  
+
 	global_io.file = io_file_open(global_io.log,
 	                              global_io.params->icfile_name,
 	                              global_io.params->ic_filetype,
@@ -226,13 +227,13 @@ local_startrunFopen(void)
 #	else
 	                              IO_FILE_UNKOWN_SWAPPING,
 #	endif
-                                
+
 	                              IO_FILE_READ,
 	                              global_io.params->reader);
-  
+
 	if (global_io.file == NULL)
 		common_terminate(EXIT_FAILURE);
-  
+
 	/* Set the scaling
    * NOTE, no reading/writing to any file will be performed; only the file structure will be accessed and updated */
 	if (global_io.file->ftype == IO_FILE_GADGET)
@@ -245,7 +246,7 @@ local_startrunFopen(void)
 		                      (io_mgadget_t)global_io.file,
 		                      global_io.params->GADGET_l2Mpch,
 		                      global_io.params->GADGET_m2Msunh);
-  
+
 #ifdef WITH_HDF5
   if (global_io.file->ftype == IO_FILE_GIZMO)
     io_gizmo_resetscale(global_io.log,
@@ -258,14 +259,14 @@ local_startrunFopen(void)
                          global_io.params->GIZMO_l2Mpch,
                          global_io.params->GIZMO_m2Msunh);
 #endif // WITH_HDF5
-  
+
 	/* Init the file */
 	io_file_init(global_io.log, global_io.file);
-  
+
 
 	/* Now dump the file information */
 	io_file_log(global_io.log, global_io.file);
-  
+
 	return;
 }
 
@@ -276,23 +277,23 @@ local_startrunRead(void)
 	uint64_t pskip = UINT64_C(0);
 	uint64_t pread = UINT64_MAX;
 	partptr tmppart;
-  
+
 	io_logging_section(global_io.log, "Reading data from file");
-  
+
 	/* See if we are supposed to read anything at all */
 	if (global_io.file->ftype == IO_FILE_EMPTY) {
 		global_info.no_part = 0;
 		global_info.fst_part = NULL;
 		return;
 	}
-    
+
   /* First create particle storage */
 	io_logging_subsection(global_io.log, "Creating Storage");
 	global_info.no_part = io_file_get_numpart(global_io.log,
 	                                          global_io.file,
 	                                          &pskip, &pread);
 	global_info.fst_part = c_part((long)global_info.no_part);
- 
+
 	/* Create the description of the storage */
 	strg.posx.val = (void *)(global_info.fst_part->pos);
 	strg.posx.stride =   (char *)((global_info.fst_part+1)->pos)
@@ -353,7 +354,7 @@ local_startrunRead(void)
 #	else
 	strg.bytes_int = 0;
 #	endif
-  
+
 #	ifdef METALHACK
 	strg.z.val = &(global_info.fst_part->z);
 	strg.z.stride =   (char *)&((global_info.fst_part+1)->z)
@@ -362,12 +363,12 @@ local_startrunRead(void)
 	strg.age.stride =   (char *)&((global_info.fst_part+1)->age)
   - (char *)&(global_info.fst_part->age);
 #	endif
-  
+
 #	ifdef VERBOSE
 	/* Print the description */
 	io_file_strg_log(global_io.log, strg);
 #	endif
-  
+
   /* Now read the particles */
 	io_logging_subsection(global_io.log, "Reading");
 	if (io_file_readpart(global_io.log, global_io.file,
@@ -375,7 +376,7 @@ local_startrunRead(void)
 		/* We read 0 particles from the file, this is an error */
 		common_terminate(EXIT_FAILURE);
 	}
-  
+
 	/* Print the first two particles to the logfile */
 	io_logging_subsection(global_io.log, "Short sanity check");
 	tmppart = global_info.fst_part;
@@ -450,7 +451,7 @@ local_startrunRead(void)
 	               "    age:                    %g",
 	               tmppart->age);
 #	endif
-  
+
 #	ifdef MPI_DEBUG
 	io_logging_subsection(global_io.log, "Longer sanity check");
 	io_logging_msg(global_io.log, INT32_C(0),
@@ -458,7 +459,7 @@ local_startrunRead(void)
 	               "with correct multimass information now).");
 	io_file_log(global_io.log, global_io.file);
 #	endif
-  
+
   return;
 }
 
@@ -466,7 +467,7 @@ static void
 local_startrunSimparams()
 {
 	io_logging_section(global_io.log, "Setting simulation parameter");
-  
+
 	io_logging_subsection(global_io.log, "Information from file");
 #	ifdef WITH_MPI
 	if (global_mpi.rank != 0) {
@@ -477,7 +478,7 @@ local_startrunSimparams()
    {
 #	endif
 		int32_t no_timestep;
-    
+
 		io_file_get(global_io.log, global_io.file, IO_FILE_GET_BOXSIZE, (void *)&(simu.boxsize));
 		io_file_get(global_io.log, global_io.file, IO_FILE_GET_OMEGA0, (void *)&(simu.omega0));
 		io_file_get(global_io.log, global_io.file, IO_FILE_GET_OMEGAL, (void *)&(simu.lambda0));
@@ -494,16 +495,19 @@ local_startrunSimparams()
 		io_file_get(global_io.log, global_io.file, IO_FILE_GET_MMASS, (void *)&(simu.multi_mass));
 		io_file_get(global_io.log, global_io.file, IO_FILE_GET_MINWEIGHT, (void *)&(simu.min_weight));
 		io_file_get(global_io.log, global_io.file, IO_FILE_GET_MAXWEIGHT, (void *)&(simu.max_weight));
-    
+
 		/* Copy over the information contained in the parameter file */
 		simu.NGRID_DOM     = global_io.params->NGRID_DOM;
 		simu.NGRID_MIN     = simu.NGRID_DOM;
 		simu.Nth_dom       = global_io.params->Nth_dom;
 		simu.Nth_ref       = global_io.params->Nth_ref;
     simu.lb_level      = global_io.params->lb_level;
-    
+
     //fprintf(stderr,"simu.lb_level=%d global_io.params->lb_level=%d\n",simu.lb_level,global_io.params->lb_level);
-    
+
+    simu.anifac[0] = global_io.params->anifac[0];
+    simu.anifac[1] = global_io.params->anifac[1];
+    simu.anifac[2] = global_io.params->anifac[2];
     simu.MaxGatherRad  = global_io.params->MaxGatherRad;
     simu.UserDvir      = global_io.params->UserDvir;
     simu.UseRhoBack    = global_io.params->UseRhoBack;
@@ -512,7 +516,7 @@ local_startrunSimparams()
 		simu.AHF_VTUNE     = global_io.params->AHF_VTUNE;
     simu.GADGET_m2Msunh= global_io.params->GADGET_m2Msunh;
     simu.GADGET_l2Mpch = global_io.params->GADGET_l2Mpch;
-     
+
 #ifdef WITH_HDF5
     simu.GIZMO_m2Msunh= global_io.params->GIZMO_m2Msunh;
     simu.GIZMO_l2Mpch = global_io.params->GIZMO_l2Mpch;
@@ -526,7 +530,7 @@ local_startrunSimparams()
 #if (defined AHFmixHaloIDandSnapID || defined SUSSING2013)
     simu.isnap         = global_io.params->isnap;
 #endif
-    
+
 		/* Set quantities given by constants */
 #		ifdef NP_LIMIT
 		simu.np_limit = TRUE;
@@ -534,29 +538,29 @@ local_startrunSimparams()
 		simu.np_limit = FALSE;
 #		endif
 		simu.mean_dens = (double) 1.0;
-    
+
 #ifdef MULTIMASS
     simu.multi_mass = 1;
 #endif
-    
+
 		simu.mmfocus  = 0;
 		simu.hydro    = 0;
 		simu.magneto  = 0;
-    
+
 		/* Set the time unit */
 		simu.t_unit = 1/H0; // we assume that we only ever deal with
 		                    // cosmological simulations...
-    
+
 		/* Set derived quantities */
 		simu.SHIFT     = ((double)0.5000000/(double) simu.NGRID_DOM);
 		simu.z_initial = (double)1.0/simu.a_initial - (double)1.0;
 		simu.a_final   = (double)1.0/((double)1.0 + simu.z_final);
 		simu.FourPiG   = 1.5*simu.omega0;
-    
+
 		/* Do some sanity checks */
 		io_file_get(global_io.log, global_io.file,
 		            IO_FILE_GET_NOTSTEP, (void *)&(no_timestep));
-    
+
 		if ( isless(fabs(simu.a_initial-simu.a_final), ZERO) ) {
 			io_logging_warn(global_io.log, INT32_C(3),
 			                "Since a_initial = %g is equal to "
@@ -578,7 +582,7 @@ local_startrunSimparams()
       simu.z_initial = 1./simu.a_initial - 1.;
 		}
    } /* End of stuff done solely by process 0 */
-    
+
     io_logging_subsection(global_io.log, "Gathering from reading processes");
 #	ifdef WITH_MPI
     io_logging_msg(global_io.log, INT32_C(4), "Broadcast of simulation parameters!");
@@ -588,15 +592,15 @@ local_startrunSimparams()
               MPI_COMM_WORLD);
     io_logging_msg(global_io.log, INT32_C(4), "Broadcast done.");
 #	endif
-    
-    
+
+
     /* Create timeline */
     io_logging_subsection(global_io.log, "Local setup");
     io_logging_msg(global_io.log, INT32_C(2), "Creating timeline from a = %g to a = %g",
                    simu.a_initial/10., simu.a_final);
     create_timeline(simu.a_initial/10., simu.a_final, &simu.timeline);
     io_logging_msg(global_io.log, INT32_C(2), "Timeline created");
-    
+
     /* Set the SFC information */
     io_logging_msg(global_io.log, INT32_C(2), "Setting volume boundaries");
 #	ifdef AHFrestart
@@ -619,14 +623,14 @@ local_startrunSimparams()
     io_logging_msg(global_io.log, INT32_C(2),  "  maxkey: %"SFC_PRIkey, global_info.maxkey);
     io_logging_msg(global_io.log, INT32_C(2),  "  level : %i", global_info.level);
     io_logging_msg(global_io.log, INT32_C(2),  "  ctype : %s", sfc_curve_typestr(global_info.ctype));
-    
+
     /* Now that we have the timeline, set the time variables */
     simu.super_t_initial = calc_super_t(simu.a_initial);
     simu.super_t_final   = calc_super_t(simu.a_final);
     simu.t_initial       = calc_t(simu.a_initial);
     simu.t_final         = calc_t(simu.a_final);
-    
-    
+
+
     /* FIXME
      * Not set or not properly set simu-structure members:
      *
@@ -665,7 +669,7 @@ local_startrunSimparams()
     simu.m_unit = 0.0;
     simu.no_gas   = 0;
     simu.no_stars = 0;
-    
+
     //#	ifdef VERBOSE
     /* Be so kind and write everything to the logfile */
     io_logging_subsection(global_io.log, "Used simulation parameters");
@@ -704,28 +708,28 @@ local_startrunSimparams()
     io_logging_msg(global_io.log, INT32_C(5), "simu.multi_mass      :  %i", simu.multi_mass);
     io_logging_msg(global_io.log, INT32_C(5), "simu.double_precision:  %i", simu.double_precision);
     //#	endif /* VERBOSE */
-    
-    
+
+
     //fprintf(stderr,"simu.lb_level=%d global_io.params->lb_level=%d\n",simu.lb_level,global_io.params->lb_level);
 
-    
+
     return;
   }
-  
+
   static void
   local_startrunRetset(double *timecounter,
                        double *timestep,
                        int32_t *no_first_timestep)
  {
 	io_logging_subsection(global_io.log, "Setting time counter");
-  
+
 #	ifdef WITH_MPI
 	if (global_mpi.rank == 0) {
 #	else
    {
 #	endif
 		double a_current;
-    
+
 		io_file_get(global_io.log, global_io.file,
 		            IO_FILE_GET_NOTSTEP, (void *)no_first_timestep);
 		io_file_get(global_io.log, global_io.file,
@@ -734,13 +738,13 @@ local_startrunSimparams()
 		            IO_FILE_GET_A, (void *)&a_current);
 		*timecounter = calc_super_t(a_current);
    }
-    
+
 #	ifdef WITH_MPI
     MPI_Bcast(timecounter, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(timestep, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
     MPI_Bcast(no_first_timestep, 1, MPI_INT, 0, MPI_COMM_WORLD);
 #	endif
-    
+
     return;
   }
-  
+

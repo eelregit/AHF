@@ -24,6 +24,7 @@
  */
 struct io_parameter_struct {
 	/* Required parameter */
+  double         anifac[3];
 	char           *icfile_name;
 	io_file_type_t ic_filetype;
 	uint32_t       reader;
@@ -38,7 +39,7 @@ struct io_parameter_struct {
 	int            lb_level;
   double         AHF_VTUNE;
   int            AHF_MINPART;
-    
+
   double         GADGET_m2Msunh;
   double         GADGET_l2Mpch;  // the GADGET units
 
@@ -46,12 +47,12 @@ struct io_parameter_struct {
   double         GIZMO_m2Msunh;
   double         GIZMO_l2Mpch;  // the GIZMO units
 #endif
-  
+
 #ifdef AHF_LRSI
 	double         lrsi_beta;
 	double         lrsi_r_s;
 #endif
-  
+
 #if (defined AHFmixHaloIDandSnapID || defined SUSSING2013)
   uint64_t       isnap;
 #endif

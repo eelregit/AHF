@@ -1,19 +1,24 @@
 [AHF]
 
+# ratio of the anisotropic scale factors to global isotropic scale factor
+anifac_x = 1
+anifac_y = 1
+anifac_z = 1
+
 # (stem of the) filename from which to read the data to be analysed
-ic_filename       = ../00DATA/SubhaloesGoingNotts/snap_C02_400_1023.
+ic_filename       = /mnt/sdceph/users/yinli/csit/planck2015/1000/1991/iso/ASMTH6/nbody/snapdir_006/snap_006.
 
 # what type of input file (cf. src/libio/io_file.h)
 ic_filetype       = 61
 
 # prefix for the output files
-outfile_prefix    = test-v010.snap_C02_400_1023
+outfile_prefix    = test_output
 
 # number of grid cells for the domain grid (1D)
 LgridDomain       = 64
 
 # number of grid cells for the domain grid (1D) (limits spatial resolution to BoxSize/LgridMax)
-LgridMax          = 16777216 
+LgridMax          = 16777216
 
 # refinement criterion on domain grid (#particles/cell)
 NperDomCell       = 2.0
@@ -21,26 +26,26 @@ NperDomCell       = 2.0
 # refinement criterion on all higher resolution grids (#particles/cells)
 NperRefCell       = 2.5
 
-# particles with velocity v > VescTune x Vesc are considered unbound 
-VescTune          = 1.5 
+# particles with velocity v > VescTune x Vesc are considered unbound
+VescTune          = 1.5
 
 # minimum number of particles for a halo
 NminPerHalo       = 20
 
 # normalisation for densities (1: RhoBack(z), 0:RhoCrit(z))
-RhoVir            = 0
+RhoVir            = 1
 
 # virial overdensity criterion (<0: let AHF calculate it); Rvir is defined via M(<Rvir)/Vol = Dvir * RhoVir
-Dvir              = 200 
+Dvir              = 200
 
 # maximum radius (in Mpc/h) used when gathering initial set of particles for each halo (should be larger than the largest halo expected)
-MaxGatherRad      = 3.0	
+MaxGatherRad      = 5.0
 
 # the level on which to perform the domain decomposition (MPI only, 4=16^3, 5=32^3, 6=64^3, 7=128^3, 8=256^3, etc.)
 LevelDomainDecomp = 6
 
 # how many CPU's for reading (MPI only)
-NcpuReading       = 1
+NcpuReading       = 8
 
 # name of file containing the dark energy relevant tables (only relevant for -DDARK_ENERGY)
 de_filename       = my_dark_energy_table.txt

@@ -25,7 +25,7 @@ export MAKE
 AHF:	FORCE dirs
 	cd src;\
 	${MAKE} AHF;\
-	mv -f AHF ../bin/AHF-v1.0-101
+	mv -f AHF ../bin/AHF
 
 
 # everything in convert/
@@ -55,10 +55,10 @@ ramses2gadget:	FORCE dirs
 		${MAKE} ramses2gadget;\
 		mv -f ramses2gadget ../bin
 
-Hdf2GADGET:	FORCE 
+Hdf2GADGET:	FORCE
 		echo "";echo "please change to convert/Hdf2GADGET/ and refer to the README in there...";echo ""
 
-Hdf2GADGET:	FORCE 
+Hdf2GADGET:	FORCE
 		echo "";echo "please change to convert/tostd/ and refer to the README in there...";echo ""
 
 # everything in tools/
@@ -234,7 +234,7 @@ sigmaH:			FORCE dirs
 
 
 #-------------------------------------------------------------------#
-# "make clean" 
+# "make clean"
 #-------------------------------------------------------------------#
 clean:	FORCE
 	@echo '';\
@@ -249,7 +249,7 @@ clean:	FORCE
 	cd ../analysis; ${MAKE} clean
 
 #-------------------------------------------------------------------#
-# "make veryclean" 
+# "make veryclean"
 #-------------------------------------------------------------------#
 veryclean:	FORCE
 	@echo '';\
@@ -264,7 +264,7 @@ veryclean:	FORCE
 	cd ../tools; ${MAKE} veryclean;\
 	cd ../analysis; ${MAKE} veryclean
 
-FORCE:	
+FORCE:
 
 dirs:
 	mkdir -p bin

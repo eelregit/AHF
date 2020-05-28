@@ -12,17 +12,17 @@
  * (#define statements without actually defining a value...)
  *=============================================================================*/
 
-/*--------------------------------------------------- 
+/*---------------------------------------------------
  *                  MISC
  *--------------------------------------------------*/
 
-#define PERIODIC                     // use periodic boundary conditions 
+#define PERIODIC                     // use periodic boundary conditions
 #define VERBOSE                      // let the user know what's going on
 //#define VERBOSE2                     // dump as much runtime information as possible
 
 //#define MULTIMASS                    // you MUST switch this on when the simulation features particles of different masses
 //#define BYTESWAP                     // forces a byteswap of the input file
- 
+
 //#define GAS_PARTICLES                // you MUST switch this on when the simulation contains gas and/or star particles
                                        /* a few more words about this switch:
                                         *   - for historical reasons it is called GAS_PARTICLES even though it actually
@@ -50,7 +50,7 @@
 //#define AHFdensrecovery              /* will be deactivated below for AHFcomcentre and activated for AHFpotcentre! */
 
 /* whether or not to dump the *.AHF_substructure file    */
-#define AHFsubstructure            /* dump substructure information (based upon halo-tree!) to file    */
+//#define AHFsubstructure            /* dump substructure information (based upon halo-tree!) to file    */
 
 /* whether or not to dump the *.AHF_disks file (in ASCII format at the moment) */
 //#define AHFdisks
@@ -67,7 +67,7 @@
 #define AHFparticle_Rmax_r2        /* base determination of Rmax and r2 upon sorted particle list    */
 //#define AHFsorthalosbymass        /* this will sort the halos by mass when writing the output files */
 //#define AHFaddDMonlyproperties    /* additionally calculates halo properties based upon DM only     */
-//#define AHFnoremunbound           /* do not perform an unbinding procedure                          */
+#define AHFnoremunbound           /* do not perform an unbinding procedure                          */
 //#define AHFnoHubbleDrag           /* will not consider the Hubble term when unbinding               */
 //#define AHFignore_ugas            /* ignores thermal energy of gas particles                        */
 //#define AHFreducedinertiatensor   /* use reduced inertia tensor for shape deterimations             */

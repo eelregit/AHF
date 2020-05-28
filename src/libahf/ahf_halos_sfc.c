@@ -3,7 +3,7 @@
 #ifdef AHF
 
 /***********************************************************************\
- *    Includes                                                         * 
+ *    Includes                                                         *
 \***********************************************************************/
 /** Okay, we need those to catch all the defines etc. */
 #include "../define.h"
@@ -34,7 +34,7 @@
 
 
 /***********************************************************************\
- *    Local defines                                                    * 
+ *    Local defines                                                    *
 \***********************************************************************/
 /*
  * Multiply the actual gather radius by this factor to catch a bit more
@@ -42,7 +42,7 @@
  * raduis.  This is meant to ensure that the initial particle selection
  * based on the SFC doesn't already, due to numerical effects, exclude
  * some particles from being considered to be halo particles.
- */ 
+ */
 #define GATHERRAD_FAC 1.001
 
 /*
@@ -79,14 +79,14 @@
 
 
 /***********************************************************************\
- *    Global variables                                                 * 
+ *    Global variables                                                 *
 \***********************************************************************/
 extern double r_fac, x_fac, v_fac, m_fac, rho_fac, phi_fac, Hubble;
 
 
 
 /***********************************************************************\
- *    Definitions of local functions                                   * 
+ *    Definitions of local functions                                   *
 \***********************************************************************/
 static uint32_t
 local_getSuitableBits(HALO *halo, double gatherRad);
@@ -113,7 +113,7 @@ local_findMinOffset(partptr fstPart,
 
 
 /***********************************************************************\
- *    Implemenation of exported functions                              * 
+ *    Implemenation of exported functions                              *
 \***********************************************************************/
 void
 ahf_halos_sfc_constructHalo(HALO *halo)
@@ -121,7 +121,7 @@ ahf_halos_sfc_constructHalo(HALO *halo)
   /* if the grid-tree did not collect any particles on spatialRef[][] it makes no sense to construct a halo */
   if(halo->npart == 0)
     return;
-  
+
 	/* Init the halo structure */
 	halo->nll   = 0;
 	halo->ll    = NULL;
@@ -135,7 +135,7 @@ ahf_halos_sfc_constructHalo(HALO *halo)
 
 	/* Get all particles inside the gather radius */
 	ahf_halos_sfc_gatherParts(halo);
-	
+
 	/* Sort the particles */
 	sort_halo_particles(halo);
 
@@ -159,7 +159,7 @@ ahf_halos_sfc_constructHalo(HALO *halo)
 	/* Do the phase space stuff */
 	HaloProfilesPhaseSpace(halo);
 #	endif
-  
+
 #ifdef AHFdisks
 	HaloProfilesDisk(halo);
 #endif
@@ -190,7 +190,7 @@ ahf_halos_sfc_gatherParts(HALO *halo)
 	centre[0] = halo->pos.x;
 	centre[1] = halo->pos.y;
 	centre[2] = halo->pos.z;
-   
+
 	/* Compare to the squared gather radius so that no sqrt is needed */
 	gatherRad  = halo->gatherRad;
 	gatherRad2 = gatherRad*gatherRad;
@@ -206,7 +206,7 @@ ahf_halos_sfc_gatherParts(HALO *halo)
 	/*--- GATHERING ---------------------------------------------------*/
 	/* Now loop over all possible cells and check which of their
 	 * particles ought to be added to the halo. */
-  
+
   if(bits == 1)
    {
     /* this loops over all cells inside the box */
@@ -223,29 +223,29 @@ ahf_halos_sfc_gatherParts(HALO *halo)
         local_checkAndAddParticles(shell[i], halo, centre, gatherRad2, ctype, bits);
     }
    }
-    
-    
+
+
 	/*--- FINISHING ---------------------------------------------------*/
 	/* Done we are */
 #ifdef VERBOSE2
 	fprintf(io.logfile,"%12ld\n", halo->npart);
 	fflush(io.logfile);
 #endif
-  
+
 	fflush(io.logfile);
 	return;
 }
 
 
 /***********************************************************************\
- *    Implementation of local functions                                * 
+ *    Implementation of local functions                                *
 \***********************************************************************/
 static uint32_t
 local_getSuitableBits(HALO *halo, double gatherRad)
 {
 	uint32_t bits = 1;
 
-	while (    (GATHERRAD_FAC * gatherRad < 1./(1<<(bits+1))) 
+	while (    (GATHERRAD_FAC * gatherRad < 1./(1<<(bits+1)))
 	        && ((bits+1)<=BITS_PER_DIMENSION) )
 		bits++;
 //	if (bits == 1) {
@@ -285,12 +285,15 @@ local_checkCellDistance(sfc_key_t key,
 
 	/* The squared distance between the cell center and the halo center */
 	LOCAL_CAL_DXYZ(cellRealPos, centre);
+    dx *= simu.anifac[0];
+    dy *= simu.anifac[1];
+    dz *= simu.anifac[2];
 	dist2 = dx*dx + dy*dy + dz*dz;
 
 	/*
 	 * If the halo center is further away than the gather radius
 	 * enlarged by largest cell radius, then the cell is too far away to
-	 * hold any halo particles, hence ignore the cell 
+	 * hold any halo particles, hence ignore the cell
 	 */
 	if (isgreater(sqrt(dist2), cellLargestRadius+GATHERRAD_FAC*gatherRad))
 		return false;
@@ -323,12 +326,15 @@ local_checkAndAddParticles(sfc_key_t key,
 	/* Now do check */
 	partTot = partIn = partOut = 0;
 	offset = minOffset;
-   
+
 	while (    (offset<(global_info.no_part)
 	        && ((global_info.fst_part+offset)->sfckey <= maxKey)) ) {
 		LOCAL_CAL_DXYZ((global_info.fst_part+offset)->pos, centre);
+        dx *= simu.anifac[0];
+        dy *= simu.anifac[1];
+        dz *= simu.anifac[2];
 		dist2 = dx*dx + dy*dy + dz*dz;
-      
+
 		if (islessequal(dist2, gatherRad2)) {
 			/* Add particle*/
       //fprintf(stderr,"\ndist2=%lf gatherRad2=%lf partIn=%ld",dist2,gatherRad2,partIn);
@@ -372,7 +378,7 @@ local_findMinOffset(partptr fstPart,
                     sfc_key_t minKey)
 {
 	uint64_t minOffset = UINT64_C(0);
-	part keyPart; 
+	part keyPart;
 	partptr result;
 	sfc_key_t keyFound;
 
@@ -407,7 +413,7 @@ local_findMinOffset(partptr fstPart,
 	/* Verify that we return the proper thing (only done for DEBUG) */
 	assert((global_info.fst_part+minOffset)->sfckey >= minKey);
 	assert(minOffset >= 0 && minOffset < numParts);
-	
+
 	return minOffset;
 }
 

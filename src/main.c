@@ -45,17 +45,17 @@ local_focusSphere(void);
 int main(int argc, char **argv)
 {
   gridls  *grid_list;        /* pointer to list of grids            */
-  
+
   int     no_grids;          /* total number of grids               */
   int     no_timestep;       /* number of coarse grid timesteps     */
   int     no_first_timestep; /* number of initial timestep          */
-  
+
   double  timecounter;       /* time variable                       */
   double  timestep;          /* timestep size                       */
   double  timecounter_final; /* for all sorts of tests...           */
-  
+
   char     AMIGA_input[MAXSTRING];
-  
+
 #ifdef WITH_MPI
   uint64_t newparts;
 #endif
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   Extrae_user_function(1);
 #endif
 
-  /*============================================================ 
+  /*============================================================
    * we always read the relevant parameters from an input file!
    *===========================================================*/
   if(argc<2)
@@ -73,8 +73,8 @@ int main(int argc, char **argv)
     fprintf(stderr,"       or %s --parameterfile\n", argv[0]);
     exit(1);
    }
-  
-  /*============================================================ 
+
+  /*============================================================
    * maybe the user only wants the parameterfile?
    *===========================================================*/
   if(strcmp(argv[1],"--parameterfile") == 0)
@@ -90,27 +90,27 @@ int main(int argc, char **argv)
    {
     strcpy(AMIGA_input, argv[1]);
    }
-  
-  
-  
-  
+
+
+
+
   /* check for some DEFINEFLAGS mistakes */
 #if (defined NCPUREADING_EQ_NFILES && defined BCASTHEADER)
   fprintf(stderr,"you cannot define NCPUREADING_EQ_NFILES and BCASTHEADER at the same time\nABORTING\n");
   exit(1);
 #endif
-  
-  
-  
-  
+
+
+
+
 #if (!defined WITH_MPI)
   WRITEAHFLOGO(stderr);
 #endif
-  
+
   /* how much memory per node and particle for this particular run */
   global.bytes_node = sizeof(struct node);
   global.bytes_part = sizeof(struct particle);
-  
+
 #	ifdef WITH_MPI
 	/* Initialize the MPI environment */
 	common_initmpi(&argc, &argv);
@@ -118,16 +118,16 @@ int main(int argc, char **argv)
 	global_mpi.start = MPI_Wtime();
 #		endif
 #	endif
-  
-  /*======================================================== 
-   * startrun:    input the initial data from infile 
+
+  /*========================================================
+   * startrun:    input the initial data from infile
    *========================================================*/
   timing.io       -= time(NULL);
-  
+
   timing.startrun -= time(NULL);
 	startrun((argc > 1) ? argv[1] : NULL, &timecounter, &timestep, &no_first_timestep);
   timing.startrun += time(NULL);
-  
+
 #ifdef WRITE_GADGET
  {
   FILE *fpout;
@@ -144,21 +144,21 @@ int main(int argc, char **argv)
   exit(0);
  }
 #endif
-  
+
 #ifdef WRITE_ASCII
  {
   FILE *fpout;
   char outname[MAXSTRING];
   partptr cur_part;
-  
+
 #ifdef WITH_MPI
   sprintf(outname,"test-%d.ascii",global_mpi.rank);
 #else
   sprintf(outname,"test.ascii");
 #endif
-  
+
   fpout = fopen(outname,"w");
-  
+
    for(cur_part=global_info.fst_part; cur_part<(global_info.fst_part+global_info.no_part); cur_part++) {
      if(cur_part->weight>1) {
        fprintf(fpout,"%e %e %e %f %f %f\n",
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
                cur_part->mom[X]*H0*simu.boxsize/global.a,cur_part->mom[Y]*H0*simu.boxsize/global.a,cur_part->mom[Z]*H0*simu.boxsize/global.a);
      }
    }
-  
+
   fclose(fpout);
 #ifdef WITH_MPI
   MPI_Barrier(MPI_COMM_WORLD);
@@ -174,8 +174,8 @@ int main(int argc, char **argv)
    //exit(0);
  }
 #endif /* WRITE_ASCII */
-  
-  
+
+
   /*==========================================================================================
    * AHFptfocus:
    *
@@ -195,7 +195,7 @@ int main(int argc, char **argv)
   long unsigned no_part;
   partptr       fst_part, cur_part, new_part;
   int           ikeep;
-  
+
   fprintf(stderr,"\n==================================================================\n");
   fprintf(stderr,"                          AHFptfocus\n");
   fprintf(stderr,"               ? ARE YOU SURE ABOUT THIS FLAG ?\n");
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
   fprintf(stderr,"AHF will now remove all particles whose type is not %d\n",AHFptfocus);
 #endif
   fprintf(stderr,"starting with %ld particles -> ",global_info.no_part);
-  
+
   /* 1. count number of particles to keep */
   no_part  = 0;
   for(cur_part=global_info.fst_part; cur_part<(global_info.fst_part+global_info.no_part); cur_part++)
@@ -227,12 +227,12 @@ int main(int argc, char **argv)
       if(fabs(cur_part->u+AHFptfocus) < ZERO)
         no_part++;
      }
-#endif    
+#endif
    }
-  
+
   /* allocate memory for new particles */
   fst_part = c_part(no_part);
-  
+
   /* 2. remove all other particles */
   new_part = fst_part;
   for(cur_part=global_info.fst_part; cur_part<(global_info.fst_part+global_info.no_part); cur_part++)
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
         ikeep = 1;
      }
 #endif
-    
+
     if(ikeep)
      {
       new_part->pos[X] = cur_part->pos[X];
@@ -269,7 +269,7 @@ int main(int argc, char **argv)
 #if (!(defined AHF_NO_PARTICLES && defined AHFlean))
       new_part->id     = cur_part->id;
 #endif
-      
+
 #ifdef DEBUG_AHFptfocus
       fprintf(fp,"%f %f %f %f %f %f %f %f\n",
               new_part->pos[X],
@@ -281,15 +281,15 @@ int main(int argc, char **argv)
               new_part->weight,
               new_part->u);
 #endif
-      
+
       new_part++;
      }
    }
-  
+
   /* erase old particle list and store new one */
   free(global_info.fst_part);
   global_info.fst_part = fst_part;
-  
+
   /* update global.no_part parameter */
   global_info.no_part  = no_part;
   fprintf(stderr,"ended with %ld particles\n\n",global_info.no_part);
@@ -297,12 +297,12 @@ int main(int argc, char **argv)
   fclose(fp);
 #endif
  }
-  timing.ptfocus += time(NULL); 
+  timing.ptfocus += time(NULL);
 #endif /* AHFptfocus */
-  
-  
-  
-  
+
+
+
+
 #ifdef AHFrfocus
   /*====================================================================
    * This is for focussing on a Sphere defined in param.h
@@ -312,15 +312,15 @@ int main(int argc, char **argv)
   timing.rfocus -= time(NULL);
 	local_focusSphere();
   timing.rfocus += time(NULL);
-#endif 
-  
-  
+#endif
+
+
 #		if (defined WITH_MPI && defined MPI_TIMING)
 	global_mpi.stop = MPI_Wtime();
 	io_logging_msg(global_io.log, INT32_C(1), "Startrun done in %fs", global_mpi.stop-global_mpi.start);
 	global_mpi.start = global_mpi.stop;
 #		endif
-  
+
 #		ifdef WITH_MPI
   timing.loadbalance -= time(NULL);
 	/* Sort the particles in a particle block structure */
@@ -354,10 +354,10 @@ int main(int argc, char **argv)
 	      &cmp_sfckey_part);
   timing.sfckey += time(NULL);
 #		endif /* WITH_MPI*/
-  
+
 #		ifdef WITH_MPI
   timing.distribution -= time(NULL);
-  
+
   /* Do a first sort of the particles, required for distributing */
   io_logging_subsection(global_io.log, "Sorting particles");
   qsort(global_info.fst_part,
@@ -371,7 +371,7 @@ int main(int argc, char **argv)
 #			else
   io_logging_msg(global_io.log, INT32_C(1), "Sorting done.");
 #			endif
-  
+
   /* Distribute the particles */
   io_logging_subsection(global_io.log, "Distributing particles");
   io_logging_msg(global_io.log, INT32_C(0), "Currently having %"PRIu64" particles.", global_info.no_part);
@@ -387,7 +387,7 @@ int main(int argc, char **argv)
   io_logging_msg(global_io.log, INT32_C(1), "Distributing done.");
 #			endif
   io_logging_msg(global_io.log, INT32_C(0), "Having %"PRIu64" particles!", global_info.no_part);
-  
+
 	/* Do the AHF distribution*/
 	io_logging_subsection(global_io.log, "AHF distribution (duplicating)");
 	newparts = comm_dist_part_ahf(global_io.log,
@@ -404,10 +404,10 @@ int main(int argc, char **argv)
 #				else
 	io_logging_msg(global_io.log, INT32_C(1), "AHF distribution done.");
 #				endif
-  
+
   timing.distribution += time(NULL);
 #		endif /* WITH_MPI */
-  
+
 
 #ifdef AHFsplit_only
   /*====================================================================
@@ -418,10 +418,10 @@ int main(int argc, char **argv)
   io_file_t dumpf;
   io_file_strg_struct_t strg;
   char *fname;
-  
+
   /* Start tge section */
   io_logging_section(global_io.log, "Dumping AHF chunk to file");
-  
+
   /* First generate the filename */
   fname = (char *)malloc( sizeof(char) *( strlen(global_io.params->outfile_prefix)+30));
   if (fname == NULL) {
@@ -430,10 +430,10 @@ int main(int argc, char **argv)
   }
   sprintf(fname, "%s.chunk.%04i.dump", global_io.params->outfile_prefix, global_mpi.rank);
   io_logging_msg(global_io.log, UINT32_C(0), "Used filename: %s", fname);
-  
+
   fflush(NULL);
   MPI_Barrier(MPI_COMM_WORLD);
-  
+
   /* Assign particles to structure */
   strg.posx.val = (void *)(global_info.fst_part->pos);
   strg.posx.stride =   (char *)((global_info.fst_part+1)->pos  ) - (char *)(global_info.fst_part->pos);
@@ -485,13 +485,13 @@ int main(int argc, char **argv)
 #	else
   strg.bytes_int = sizeof(global_info.fst_part->id);
 #	endif
-  
+
   /* Open the dump file now */
   dumpf = io_file_open(global_io.log, fname, IO_FILE_ARES, IO_FILE_UNKOWN_SWAPPING, IO_FILE_WRITE, 0);
-  
+
   /* Write the particles */
   io_file_writepart(global_io.log, dumpf, 0, global_info.no_part, strg);
-  
+
   /* Set the header values */
   ((io_ares_t)dumpf)->header->no_part = (uint64_t)simu.no_part;
   ((io_ares_t)dumpf)->header->no_species = UINT64_C(0);
@@ -510,20 +510,20 @@ int main(int argc, char **argv)
   ((io_ares_t)dumpf)->header->lb_level = global_info.loadbal->level;
   ((io_ares_t)dumpf)->header->rank = global_mpi.rank;
   ((io_ares_t)dumpf)->header->size = global_mpi.size;
-  
+
   /* Log the file */
   io_file_log(global_io.log, dumpf);
-  
-  /* Close the file and clean up*/		
+
+  /* Close the file and clean up*/
   io_file_close(global_io.log, &dumpf);
   free(fname);
  }
 	common_terminate(EXIT_SUCCESS);
 #endif /*  AHFsplit_only */
-  
-  
-  
-  
+
+
+
+
 #ifdef AHF_DUMP_AFTER_READ_TO_ASCII
   /*====================================================================
    * write an ASCII file of the data just read
@@ -531,7 +531,7 @@ int main(int argc, char **argv)
  {
   FILE *dumpf;
   char *fname;
-  
+
   /* First generate the filename */
   fname = (char *)malloc( sizeof(char) *( strlen(global_io.params->outfile_prefix)+35));
   if (fname == NULL) {
@@ -548,7 +548,7 @@ int main(int argc, char **argv)
 #ifdef WITH_MPI
   MPI_Barrier(MPI_COMM_WORLD);
 #endif
-  
+
   dumpf = fopen(fname, "w");
   fprintf(dumpf, "# x y z  vx vy vz  ID\n");
   for (uint64_t i=0L; i<global_info.no_part; i++) {
@@ -567,120 +567,120 @@ int main(int argc, char **argv)
  }
 #endif
 
-  
+
 #ifdef WITH_MPI
 	loadbalance_minimalMemory(global_io.log, global_info.loadbal);
 #endif
 	io_logging_msg(global_io.log, INT32_C(5), "amiga_main:  running with %" PRIu64 " particles", global_info.no_part);
 	io_logging_part(global_io.log, "Handing over logging to AMIGA");
-  
+
   timing.io       += time(NULL);
-  
-  
-  
-  
-  /*===================================================================== 
+
+
+
+
+  /*=====================================================================
    * at this point we completely read in the data file
    * and are ready to proceed with generating the
    * grid hierarchy or what else we plan to do...
    *=====================================================================*/
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
   /*====================================================================
    *  GENERATE THE FULL BLOWN AMR HIERARCHY AND ORGANIZE IT INTO A TREE
    *====================================================================*/
-  
+
   /*=====================================================================
-   * generate the domain grids: simu.NGRID_MIN^3, ...., simu.NGRID_DOM^3 
+   * generate the domain grids: simu.NGRID_MIN^3, ...., simu.NGRID_DOM^3
    *=====================================================================*/
   timing.generate_tree -= time(NULL);
   timing.gendomgrids -= time(NULL);
-  grid_list = gen_domgrids(&no_grids);   
+  grid_list = gen_domgrids(&no_grids);
   timing.gendomgrids += time(NULL);
-  
-  /*===================================================================== 
-   * build initial linked list 
+
+  /*=====================================================================
+   * build initial linked list
    *=====================================================================*/
   timing.ll -= time(NULL);
 	ll(global_info.no_part, global_info.fst_part, global.dom_grid);
 	global.fst_part = global_info.fst_part;
   global.no_part  = global_info.no_part;
   timing.ll += time(NULL);
-  
+
   /*================================================================
-   * assign particles to the domain grid with simu.NGRID_DOM^3 nodes 
+   * assign particles to the domain grid with simu.NGRID_DOM^3 nodes
    *================================================================*/
   zero_dens(global.dom_grid);
   assign_npart(global.dom_grid);
-  
+
   /*================================================================
-   * initialize some counters 
+   * initialize some counters
    *================================================================*/
   no_timestep         = no_first_timestep+1;  /* count total number of integration steps */
   global.total_time   = 0.;                   /* cumulative total time for simulation    */
   global.output_count = 0;                    /* count the number of outputs             */
-  
+
   /* make *current* time step available to AHF/etc. routines */
   global.no_timestep = no_first_timestep;
-  
-  /*========================================================================================= 
+
+  /*=========================================================================================
    * recursively call gen_AMRhierarchy() to generate the AMR hierarchy...
    *=========================================================================================*/
   global.fst_cycle = TRUE;
   gen_AMRhierarchy(&grid_list, &no_grids);
-  
-  /*========================================================================================= 
+
+  /*=========================================================================================
    * eventually perform AHF analysis of AMR hierarchy
    *=========================================================================================*/
   ahf.time -= time(NULL);
-  
+
   /* get spatially connected refinement patches */
   timing.ahf_gridinfo -= time(NULL);
   ahf_gridinfo(grid_list, no_grids-1);
   timing.ahf_gridinfo += time(NULL);
-  
-  
+
+
   /* get AHF halos */
   timing.ahf_halos -= time(NULL);
   ahf_halos(grid_list);
-  timing.ahf_halos += time(NULL);    
-  
+  timing.ahf_halos += time(NULL);
+
   ahf.time += time(NULL);
- 
-  /*========================================================================================= 
+
+  /*=========================================================================================
    * update logfile and say bye-bye
    *=========================================================================================*/
   write_logfile(timecounter, timestep, no_timestep);
-  
+
   /* free all allocated memory... */
   free(grid_list);
-  
-  
+
+
   /*============================================================================
    *                                   BYE BYE!
-   *============================================================================*/  
+   *============================================================================*/
   free(io.icfile_name);
   free(io.dumpfile_name);
   free(io.logfile_name);
   free(io.outfile_prefix);
   free(global.termfile_name);
-  
+
   free(global.fst_part);
   if(global.fst_gas)
     free(global.fst_gas);
   if(global.fst_star)
     free(global.fst_star);
-  
-  
+
+
   fprintf(io.logfile, "==========================================================\n");
   fprintf(io.logfile, "                       FINISHED (v%3.1f/%03d)\n",VERSION,BUILD);
   fprintf(io.logfile, "==========================================================\n");
   fclose(io.logfile);
-  
+
 #	ifdef WITH_MPI
 	/* Gracefully terminate MPI */
 	MPI_Finalize();
@@ -706,7 +706,7 @@ local_communicate_all(void)
      \*********************/
 		/** This is where to send to */
 		int target;
-    
+
 		for (target = 1; target < global_mpi.size; target++) {
 			MPI_Send(&global, sizeof(struct info_global),
 			         MPI_BYTE,
@@ -721,16 +721,16 @@ local_communicate_all(void)
      \*********************/
 		/** The status */
 		MPI_Status stat;
-    
+
 		MPI_Recv(&global, sizeof(struct info_global),
 		         MPI_BYTE,
 		         0, 0, MPI_COMM_WORLD, &stat);
-    
+
 		/*********************\
 		 *  DONE  RECIEVING  *
      \*********************/
 	}
-  
+
 	return;
 }
 #endif
@@ -751,38 +751,41 @@ local_focusSphere(void)
 	int8_t   *tags;
 	uint64_t i, j;
 	partptr newParts;
-  
+
 	/* The sphere to focus on, give in Mpc/h (cf. param.h) */
 	center[X] = AHFrfocusX;
 	center[Y] = AHFrfocusY;
 	center[Z] = AHFrfocusZ;
 	radSqr    = AHFrfocusR;
-  
+
 	fprintf(stderr, "ATTENTION!  This is AHFrfocus calling:\n");
 	fprintf(stderr, "This will remove all particles outside this sphere:\n");
 	fprintf(stderr, "Center: (%lf %lf %lf) Mpc/h",
 	        center[X], center[Y], center[Z]);
 	fprintf(stderr, "Radius: %lf Mpc/h\n", radSqr);
 	fprintf(stderr,"starting with %ld particles -> ",global_info.no_part);
-  
+
 	/* Convert center and radius to AHF units */
 	center[X] /= simu.boxsize;
 	center[Y] /= simu.boxsize;
 	center[Z] /= simu.boxsize;
 	radSqr /= simu.boxsize;
 	radSqr *= radSqr;
-  
+
 	/* Keeps a record whether the particle is kept or not. */
 	tags = malloc(sizeof(int8_t) * oldNumPart);
-  
+
 	/* Check which particles to keep (ignoring periodicity) */
 	for (i=UINT64_C(0); i<oldNumPart; i++) {
 		double dpos[3];
 		double rSqr;
-    
+
 		dpos[X] = global_info.fst_part[i].pos[X] - center[X];
 		dpos[Y] = global_info.fst_part[i].pos[Y] - center[Y];
 		dpos[Z] = global_info.fst_part[i].pos[Z] - center[Z];
+        dpos[X] *= simu.anifac[0];
+        dpos[Y] *= simu.anifac[1];
+        dpos[Z] *= simu.anifac[2];
 		rSqr  = dpos[X] * dpos[X] + dpos[Y] * dpos[Y]
     + dpos[Z] * dpos[Z];
 		if (rSqr <= radSqr) {
@@ -792,7 +795,7 @@ local_focusSphere(void)
 			tags[i] = 0;
 		}
 	}
-  
+
 	/* Get new particles and copy the old ones over. */
 	newParts = c_part(newNumPart);
 	for (j = i = UINT64_C(0); i<oldNumPart; i++) {
@@ -803,20 +806,20 @@ local_focusSphere(void)
 		}
 	}
 	assert(j == newNumPart);
-  
+
 	/* Clean */
 	free(tags);
 	free(global_info.fst_part);
-  
+
 	/* Activate the new particles. */
 	global_info.fst_part = newParts;
 	global_info.no_part  = newNumPart;
 	fprintf(stderr,"ended with %ld particles\n\n",global_info.no_part);
-  
-  
+
+
   {
     FILE *fp;
-    
+
     fp = fopen("AHFrsphere.txt","w");
     for(i=0; i<global_info.no_part; i++) {
       fprintf(fp,"%g %g %g %g\n",

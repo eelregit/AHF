@@ -212,7 +212,7 @@ ahf_halos(gridls *grid_list)
 	rho_crit = a3* calc_rho_crit(a);        /* comoving(!) critical density   */
 	rho_b    = omega * rho_crit;            /* comoving(!) background density */
   rho_vir  = a3*calc_rho_vir(a);          /* comoving(!) density used to normalize densities */
-  
+
 	/* Properly store those values in the global structure */
 	global.ovlim   = ovlim;
 	global.rho_b   = rho_b;
@@ -244,7 +244,7 @@ ahf_halos(gridls *grid_list)
 	fprintf(io.logfile, "Delta_vir(z) = %g\n", ovlim);
 	fprintf(io.logfile, "Hubble(z)    = %g\n", Hubble);
 	fflush(io.logfile);
-  
+
 
 	/* prepare output filenames */
 #  ifdef WITH_MPI
@@ -362,7 +362,7 @@ ahf_halos(gridls *grid_list)
 		exit(-1);
 	}
   timing.analyseRef += time(NULL);
-  
+
   timing.generate_tree += time(NULL);
 
 #ifdef AHFgridtreefile
@@ -371,7 +371,7 @@ ahf_halos(gridls *grid_list)
   fprintf(stderr, "\nWriting the spatialRef[][] tree to a file\n");
   fprintf(io.logfile, "\nWriting the spatialRef[][] tree to a file\n");
   fflush(io.logfile);
-  
+
   WriteGridtreefile(fprefix, ahf.no_grids, spatialRef);
 
   //exit(0);
@@ -391,14 +391,14 @@ ahf_halos(gridls *grid_list)
 	}
   timing.spatialRef2halos += time(NULL);
 
-  
+
 #ifdef AHFwritePreliminaryHalos
  {
   FILE *fp;
   char outfile[MAXSTRING];
   long unsigned *idx, *idxtmp;
   double        *fsort;
-  
+
   // sort haloes by npart
   idx    = (long unsigned *)calloc(numHalos, sizeof(long unsigned));
   idxtmp = (long unsigned *)calloc(numHalos, sizeof(long unsigned));
@@ -406,16 +406,16 @@ ahf_halos(gridls *grid_list)
   for (i = 0; i < numHalos; i++)
     fsort[i] = (double)halos[i].npart;
   indexx(numHalos, fsort-1, idxtmp-1);
-  
+
   /* indexx sorts ascending and gives indizes starting at 1 */
   for (i = 0; i < numHalos; i++)
     idx[numHalos - i - 1] = idxtmp[i] - 1;
   free(idxtmp);
   free(fsort);
-  
+
   sprintf(outfile,"%s.AHF_preliminaryhalos",fprefix);
   fp = fopen(outfile,"w");
-  
+
   fprintf(fp,"%d\n",numHalos);
   for(k=0; k<numHalos; k++) {
     i = idx[k];
@@ -432,7 +432,7 @@ ahf_halos(gridls *grid_list)
             halos[i].hostHalo,
             halos[i].hostHaloLevel,
             halos[i].numSubStruct);
-    
+
 #ifdef HaloTree
     if(halos[i].numSubStruct > 0) {
       for(k=0; k<halos[i].numSubStruct; k++) {
@@ -442,7 +442,7 @@ ahf_halos(gridls *grid_list)
 #endif
   }
   free(idx);
-  
+
   fclose(fp);
   //exit(0);
  }
@@ -486,7 +486,7 @@ ahf_halos(gridls *grid_list)
 
 
 
-  
+
   /**************************************************************************/
   /*                CALCULATE ALL RELEVANT HALO PROPERTIES                  */
 	/**************************************************************************/
@@ -505,8 +505,8 @@ ahf_halos(gridls *grid_list)
   /* this construct integral as well as profile properties of each halo */
 	for (i = 0; i < numHalos; i++) {
 		ahf_halos_sfc_constructHalo(halos + i);
-	}  
-  
+	}
+
 #if (defined WITH_MPI || defined AHFrestart)
   /**************************************************************************/
   /*            FLAG/REMOVE HALOES NOT IN ACTUAL MPI DOMAIN                 */
@@ -526,10 +526,10 @@ ahf_halos(gridls *grid_list)
 #endif
 	/* Removing the haloes in the boundary zone */
 	//rem_boundary_haloes();
-  
+
 	/* Flagging the haloes in the boundary zone */
 	flag_boundary_haloes();
-  
+
   timing.ahf_halos_sfc_constructHalo += time(NULL);
 #endif
 
@@ -548,7 +548,7 @@ ahf_halos(gridls *grid_list)
 #  pragma omp parallel for schedule (dynamic)	shared(halos,numHalos,stderr) private(i,k,numSubStruct,SubStruct,ihost,isub) default(none)
 #endif
 	for (i = 0; i < numHalos; i++) {
-    
+
     /* deal with substructure IDs and lists */
     numSubStruct = 0;
     SubStruct    = NULL;
@@ -557,10 +557,10 @@ ahf_halos(gridls *grid_list)
       /* quick-and-easy access to host and subhalo in halos[] */
       isub  = halos[i].subStruct[k];
       ihost = halos[isub].hostHalo; // this should be identical to i !?
-      
+
 //      if(ihost != i) fprintf(stderr,"ihost=%ld i=%ld\n",ihost,i);
 //      if(isub < 0) fprintf(stderr,"ihost=%ld i=%ld isub=%ld\n",ihost,i,isub);
-      
+
       /* if subhalo spawned from AHF_HOSTHALOLEVEL (or below) we check for distance (and mass!) */
       if(halos[isub].hostHaloLevel >= AHF_HOSTHALOLEVEL)
        {
@@ -574,7 +574,7 @@ ahf_halos(gridls *grid_list)
           // if the host halo is not written, also do not write the subhalo
           if(halos[i].ignoreme == TRUE)
             halos[isub].ignoreme = TRUE;
-          
+
           // but if the host halo is written, also write the subhalo
           else
             halos[isub].ignoreme = FALSE;
@@ -586,21 +586,21 @@ ahf_halos(gridls *grid_list)
           halos[isub].hostHalo = -1;
          }
        }
-            
+
       /* if it spawned from above AHF_HOSTHALOLEVEL mark it as field halo */
       else
        {
         halos[isub].hostHalo = -1;
        }
      }
-    
+
     /* copy the new substructure list over to host halo structure */
     halos[i].numSubStruct = numSubStruct;
     if(numSubStruct>0)
      {
       // remove old subStruct[] array from halos[].
       if(halos[i].subStruct) free(halos[i].subStruct);
-      
+
       // put the new memory for halos[].subStruct[] into place
       halos[i].subStruct = SubStruct;
 
@@ -608,12 +608,12 @@ ahf_halos(gridls *grid_list)
 //      for (k = 0; k < halos[i].numSubStruct; k++)
 //        halos[i].subStruct[k] = SubStruct[k];
 //      free(SubStruct);
-      
+
      }
   }
   timing.ahf_halos_sfc_constructHalo += time(NULL);
-    
-  
+
+
 #ifdef AHFnewHaloIDs
   /**************************************************************************/
   /*                   ASIGN A UNIQUE ID TO EACH HALO                       */
@@ -622,7 +622,7 @@ ahf_halos(gridls *grid_list)
   /*     this has to be done before the MPI boundary haloes are removed!    */
 	/**************************************************************************/
   timing.ahf_halos_sfc_constructHalo -= time(NULL);
-  
+
   /* first get unique ID for each halo */
 	for (i = 0; i < numHalos; i++) {
     halos[i].haloID = getHaloID(halos,i);
@@ -634,10 +634,10 @@ ahf_halos(gridls *grid_list)
       halos[i].hostHaloID = halos[halos[i].hostHalo].haloID;
     }
   }
-  
+
   timing.ahf_halos_sfc_constructHalo += time(NULL);
 #endif
-  
+
 #ifdef AHFexciseSubhaloStars // note: this flag also switched on METALHACK and GAS_PARTICLES!!!
   /**************************************************************************/
   /*              REMOVE SUBHALO STAR PARTICLES FROM HOST HALO              */
@@ -653,7 +653,7 @@ ahf_halos(gridls *grid_list)
 	fprintf(io.logfile, "=====================================================\n\n");
 	fflush(io.logfile);
 #endif
-  
+
 #ifdef WITH_OPENMP
 #  pragma omp parallel for schedule (dynamic) shared(halos, numHalos, simu) private(i)
 #endif
@@ -673,10 +673,10 @@ ahf_halos(gridls *grid_list)
   }
   timing.ahf_halos_sfc_constructHalo += time(NULL);
 #endif /* AHFexciseSubhaloStars */
-  
-  
-  
-  
+
+
+
+
   timing.ahf_io -= time(NULL);
 #ifdef AHFcentrefile
   /**************************************************************************/
@@ -688,8 +688,8 @@ ahf_halos(gridls *grid_list)
 	/**************************************************************************/
 	ahf_io_WriteCenterfile(fprefix, halos, numHalos);
 #endif   /* AHFcentrefile */
-  
-  
+
+
 	/**************************************************************************/
   /*        ORDER HALOS WITH RESPECT TO NUMBER OF PARTICLES OR MASS         */
 	/**************************************************************************/
@@ -733,7 +733,7 @@ ahf_halos(gridls *grid_list)
 #ifdef VERBOSE
    fprintf(stderr, "### GENERATING AHF SQLITE3 DATABASE\n");
 #endif
-   
+
    timingTotal = timingSpecific = -timer_getTime();
 #  ifdef AHF_SQL_ONEDB_PER_TABLE
 		sql = ahf_io_sql_new(fprefix, AHF_IO_SQL_MODE_MULTIPLE, idOffset);
@@ -773,7 +773,7 @@ ahf_halos(gridls *grid_list)
 		               timingTotal);
 
 		ahf_io_sql_del(&sql);
-   
+
 #ifdef AHF_SQL_ADD_ASCII_FILES
    /*----------------------------------------------------------------------
     * here you can write whatever ASCII file you fancy, but be warned:
@@ -782,32 +782,32 @@ ahf_halos(gridls *grid_list)
     * end up with a segmentation fault or worse because the file you want
     * to write cannot be written given the current DEFINEFLAG combination!
     *----------------------------------------------------------------------*/
-   
-   
+
+
    // nothing so far as the SQL feature has not been 100% implemented yet...
-   
-   
+
+
 #endif // AHF_SQL_ADD_ASCII_FILES
 	}
 #else // AHF_SQL
  {
   double timingTotal, timingSpecific;
-  
-  
+
+
   /* AHF_halos */
   timingTotal = timingSpecific = - timer_getTime();
   ahf_io_WriteHalos(fprefix, halos, idx, numHalos);
   timingSpecific += timer_getTime();
   io_logging_msg(global_io.log, INT32_C(0),
                  "  Used %12.5gs to write halos", timingSpecific);
-  
+
   /* AHF_profiles */
   timingSpecific = -timer_getTime();
   ahf_io_WriteProfiles(fprefix, halos, idx, numHalos);
   timingSpecific += timer_getTime();
   io_logging_msg(global_io.log, INT32_C(0),
                  "  Used %12.5gs to write profiles", timingSpecific);
-  
+
 #ifdef AHFdisks
   timingSpecific = -timer_getTime();
   ahf_io_WriteDisks(fprefix, halos, idx, numHalos);
@@ -815,7 +815,7 @@ ahf_halos(gridls *grid_list)
   io_logging_msg(global_io.log, INT32_C(0),
                  "  Used %12.5gs to write disks", timingSpecific);
 #endif
-  
+
 #if ((defined AHFsubstructure) && !defined AHFrestart)
   /* AHF_substructure */
   timingSpecific = - timer_getTime();
@@ -823,8 +823,8 @@ ahf_halos(gridls *grid_list)
   timingSpecific += timer_getTime();
   io_logging_msg(global_io.log, INT32_C(0),
                  "  Used %12.5gs to write substructures", timingSpecific);
-#endif 
-  
+#endif
+
 #  ifndef AHF_NO_PARTICLES
   /* AHF_particles */
   timingSpecific = - timer_getTime();
@@ -839,8 +839,8 @@ ahf_halos(gridls *grid_list)
   timingSpecific += timer_getTime();
   io_logging_msg(global_io.log, INT32_C(0),"  Used %12.5gs to write particlesSTARDUST", timingSpecific);
 #endif /* METALHACK */
-#  endif /* AHF_NO_PARTICLES */   
-  
+#  endif /* AHF_NO_PARTICLES */
+
   timingTotal += timer_getTime();
   io_logging_msg(global_io.log, INT32_C(0),"Used %12.5gs to write data to ASCII files",timingTotal);
  }
@@ -985,7 +985,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 						for (icur_nquad = cur_nquad; icur_nquad != NULL; icur_nquad = icur_nquad->next) {
 							x = icur_nquad->x;
 							for (cur_node = icur_nquad->loc; cur_node < icur_nquad->loc + icur_nquad->length; cur_node++, x++) {
-                
+
 								/* Locate the spatial refinement */
 								refLevel    = spatialRefIndex[cur_node->force.colour].refLevel;
 								isoRefIndex = spatialRefIndex[cur_node->force.colour].isoRefIndex;
@@ -1048,7 +1048,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 								}
 
 #ifdef AHFmaxdenscentre
-                
+
 								/* halo centre = position of max. density node **/
 								if (tmpDens > spatialRef[refLevel][isoRefIndex].maxDens) {
 									spatialRef[refLevel][isoRefIndex].centreDens.x    = xx;
@@ -1061,7 +1061,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 								}
 
 #else   /* AHFmaxdenscentre */
-      
+
                 /* halo centre = density weighted centre of isolated refinement */
 								spatialRef[refLevel][isoRefIndex].centreDens.x    += xx * tmpDens;
 								spatialRef[refLevel][isoRefIndex].centreDens.y    += yy * tmpDens;
@@ -1071,7 +1071,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 								/* store maximum density */
 								if (tmpDens > spatialRef[refLevel][isoRefIndex].maxDens)
 									spatialRef[refLevel][isoRefIndex].maxDens = tmpDens;
-                
+
 #endif   /* AHFmaxdenscentre */
 
 
@@ -1119,7 +1119,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
                       if ((px == 1) && (xp < 0.5)) xp += 1.0;
                       if ((py == 1) && (yp < 0.5)) yp += 1.0;
                       if ((pz == 1) && (zp < 0.5)) zp += 1.0;
-                      
+
 											spatialRef[refLevel][isoRefIndex].centreCMpart.x += xp;
 											spatialRef[refLevel][isoRefIndex].centreCMpart.y += yp;
 											spatialRef[refLevel][isoRefIndex].centreCMpart.z += zp;
@@ -1167,7 +1167,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
                   fprintf(stderr,"             cur_node->dens = %g\n",cur_node->dens);
 #endif
                 }
-                
+
 							}
 						}
 					}
@@ -1328,7 +1328,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 				spatialRef[i][j].centreDens.y = spatialRef[i][j].centreGEOM.y;
 				spatialRef[i][j].centreDens.z = spatialRef[i][j].centreGEOM.z;
 			}
-      
+
       /*-------------------------------------------------
 			 * catch spatialRef's with unphysical densities
 			 *-------------------------------------------------*/
@@ -1354,7 +1354,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 			spatialRef[i][j].centre.x = spatialRef[i][j].centreCMpart.x;
 			spatialRef[i][j].centre.y = spatialRef[i][j].centreCMpart.y;
 			spatialRef[i][j].centre.z = spatialRef[i][j].centreCMpart.z;
-            
+
 #  else /* AHFcomcentre */
 
 #   ifdef AHFgeomcentre
@@ -1362,9 +1362,9 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
 			spatialRef[i][j].centre.y = spatialRef[i][j].centreGEOM.y;
 			spatialRef[i][j].centre.z = spatialRef[i][j].centreGEOM.z;
 #   endif
-         
+
 #  endif /* AHFcomcentre */
-         
+
 #endif /* AHFpotcentre */
 		}
 	}
@@ -1597,7 +1597,7 @@ RefCentre(gridls *grid_list, int num_refgrids, SPATIALREF **spatialRef)
  {
   FILE *fpsref;
   char filename1[MAXSTRING];
-  
+
   sprintf(filename1,"%sz%.3f.spatialRef",global_io.params->outfile_prefix,global.z);
   fpsref = fopen(filename1,"w");
 	for (i = 0; i < num_refgrids; i++) {
@@ -1661,7 +1661,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 	int    minNodes = 10000000;
 
   tmpArray = NULL;
-  
+
 	/* Isolated refinement under investiagation */
 	hirefLevel    = 3;
 	hiisoRefIndex = 134;
@@ -1774,7 +1774,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
             free(tmpArray);
             tmpArray = NULL;
 					}
-          
+
 					spatialRef[i][j].subStruct[spatialRef[i][j].numSubStruct-1].refLevel    = i + 1;
 					spatialRef[i][j].subStruct[spatialRef[i][j].numSubStruct-1].isoRefIndex = k;
 
@@ -1818,7 +1818,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
             free(tmpArray);
             tmpArray = NULL;
 					}
-          
+
 					spatialRef[i + 1][k].parDom[spatialRef[i + 1][k].numParDom - 1].refLevel    = i;
 					spatialRef[i + 1][k].parDom[spatialRef[i + 1][k].numParDom - 1].isoRefIndex = j;
 
@@ -1870,6 +1870,10 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 						if (dx > 0.5)							dx = 1.0 - dx;
 						if (dy > 0.5)							dy = 1.0 - dy;
 						if (dz > 0.5)							dz = 1.0 - dz;
+
+                        dx *= simu.anifac[0];
+                        dy *= simu.anifac[1];
+                        dz *= simu.anifac[2];
 
 						dist = dx * dx + dy * dy + dz * dz;
 
@@ -1950,7 +1954,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 									tmpCount++;
 								}
 							}
-              
+
               free(tmpArray);
               tmpArray = NULL;
 						}
@@ -1994,7 +1998,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 
 	/********************************************************************************************************************************************************
 	 *******************************************************************************************/
-        
+
 	/* Double checking
 	 * Picking up halos that don't have parents */
 	for (i = 1; i < num_refgrids; i++) {
@@ -2022,7 +2026,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 
 				/* loop over all spatial refinements on next coarser level */
 				for (p = 0; p < numIsoRef[i - 1]; p++) {
-          
+
 					/* irrespective of "#ifdef PARDAU_*" we search for the refinement closest in distance */
 
 					dx = x - spatialRef[i - 1][p].centreDens.x;
@@ -2037,6 +2041,10 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 					if (dx > 0.5)						dx = 1.0 - dx;
 					if (dy > 0.5)						dy = 1.0 - dy;
 					if (dz > 0.5)						dz = 1.0 - dz;
+
+                    dx *= simu.anifac[0];
+                    dy *= simu.anifac[1];
+                    dz *= simu.anifac[2];
 
 					dist = dx * dx + dy * dy + dz * dz;
 
@@ -2076,7 +2084,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 				/* Create tmp array of the names of the sub halos for this parent */
         if(tmpArray) free(tmpArray);
 				tmpArray = NULL;
-        
+
         /* we need to add +1 to make space for the new substructure */
 				if ((tmpArray = calloc(spatialRef[tmprefLevel][tmpisoRefIndex].numSubStruct+1, sizeof(int))) == NULL) {
 					fprintf(stderr, "Error in allocating the memory for remove substrcture array\n");
@@ -2089,7 +2097,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 
 				/* adding the substructure to the end of the parent substructure listing */
 				spatialRef[tmprefLevel][tmpisoRefIndex].numSubStruct += 1;
-        
+
         /* generate a new .subStruct[] array able to hold one more entry at the end */
 				if(spatialRef[tmprefLevel][tmpisoRefIndex].subStruct) free(spatialRef[tmprefLevel][tmpisoRefIndex].subStruct);
 				spatialRef[tmprefLevel][tmpisoRefIndex].subStruct = NULL;
@@ -2172,6 +2180,9 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 					if (dy > 0.5)						dy = 1.0 - dy;
 					if (dz > 0.5)						dz = 1.0 - dz;
 
+                    dx *= simu.anifac[0];
+                    dy *= simu.anifac[1];
+                    dz *= simu.anifac[2];
 
 					dist = dx * dx + dy * dy + dz * dz;
 
@@ -2230,42 +2241,46 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 				for (k = 0; k < spatialRef[i][j].numSubStruct; k++) {
 					isoRefIndex    = spatialRef[i][j].subStruct[k].isoRefIndex;
 					isoRefIndexOLD = isoRefIndex;
-          
+
           // do not try to find closeRefDist for the daughter
           if(isoRefIndex != spatialRef[i][j].daughter.isoRefIndex)
            {
             x = spatialRef[i+1][isoRefIndex].centreDens.x;
             y = spatialRef[i+1][isoRefIndex].centreDens.y;
             z = spatialRef[i+1][isoRefIndex].centreDens.z;
-            
+
             tmpMin = 10000000000000.0;
             /* loop over all subhaloes other than k */
             for (l = 0; l < spatialRef[i][j].numSubStruct; l++) {
-              
+
               // avoid distance to itself
               if (k != l) {
                 isoRefIndex = spatialRef[i][j].subStruct[l].isoRefIndex;
-                
+
                 dx = x - spatialRef[i+1][isoRefIndex].centreDens.x;
                 dx = fabs(dx);
-                
+
                 dy = y - spatialRef[i+1][isoRefIndex].centreDens.y;
                 dy = fabs(dy);
-                
+
                 dz = z - spatialRef[i+1][isoRefIndex].centreDens.z;
                 dz = fabs(dz);
-                
+
                 if (dx > 0.5)	dx = 1.0 - dx;
                 if (dy > 0.5)	dy = 1.0 - dy;
                 if (dz > 0.5) dz = 1.0 - dz;
-                
+
+                dx *= simu.anifac[0];
+                dy *= simu.anifac[1];
+                dz *= simu.anifac[2];
+
                 dist = pow2(dx) + pow2(dy) + pow2(dz);
-                
+
                 if (dist < tmpMin && spatialRef[i+1][isoRefIndex].numParts > spatialRef[i+1][isoRefIndexOLD].numParts)
                   tmpMin = dist;
               }
             }
-            
+
             // this is highly tunable, but so far the half-distance worked best!
             spatialRef[i+1][isoRefIndexOLD].closeRefDist = 0.75 * sqrt(tmpMin);
           }
@@ -2276,50 +2291,54 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 				for (k = 0; k < spatialRef[i][j].numSubStruct; k++) {
 					isoRefIndex    = spatialRef[i][j].subStruct[k].isoRefIndex;
 					isoRefIndexOLD = isoRefIndex;
-          
+
           // do not try to find closeRefDist for the daughter
           if(isoRefIndex != spatialRef[i][j].daughter.isoRefIndex)
            {
             x = spatialRef[i+1][isoRefIndex].centreDens.x;
             y = spatialRef[i+1][isoRefIndex].centreDens.y;
             z = spatialRef[i+1][isoRefIndex].centreDens.z;
-            
+
             tmpMin = 10000000000000.0;
             /* loop over all subhaloes other than k */
             for (l = 0; l < spatialRef[i][j].numSubStruct; l++) {
-              
+
               // avoid distance to itself
               if (k != l) {
                 isoRefIndex = spatialRef[i][j].subStruct[l].isoRefIndex;
-                
+
                 dx  = x - spatialRef[i+1][isoRefIndex].centreDens.x;
                 dx = fabs(dx);
-                
+
                 dy = y  - spatialRef[i+1][isoRefIndex].centreDens.y;
                 dy = fabs(dy);
-                
+
                 dz = z - spatialRef[i+1][isoRefIndex].centreDens.z;
                 dz = fabs(dz);
-                
+
                 if (dx > 0.5)	dx = 1.0 - dx;
                 if (dy > 0.5)	dy = 1.0 - dy;
                 if (dz > 0.5) dz = 1.0 - dz;
-                
+
+                dx *= simu.anifac[0];
+                dy *= simu.anifac[1];
+                dz *= simu.anifac[2];
+
                 dist = pow2(dx) + pow2(dy) + pow2(dz);
-                
+
                 //if (dist < tmpMin && spatialRef[i+1][isoRefIndex].numParts > spatialRef[i+1][isoRefIndexOLD].numParts)
                 if (dist < tmpMin)
                   tmpMin = dist;
               }
             }
-            
+
             // this is highly tunable, but so far the half-distance worked best!
             spatialRef[i+1][isoRefIndexOLD].closeRefDist = 0.5 * sqrt(tmpMin);
           }
         }
 			} /* IF loop over all subhaloes within this host [i][j] */
 #endif // AHFnewCloseRefDist
-      
+
 		} // loop over all spatialRef[i][j]
 	}
 
@@ -2378,9 +2397,9 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 		tmpIsoRefIndex = NULL;
 		tmpCount       = 0;
 		for (j = 0; j < numIsoRef[i]; j++) {
-      
+
 			for (k = 0; k < spatialRef[i][j].numSubStruct; k++) {
-        
+
 				for (l = 0; l < tmpCount; l++) {
 					if (tmpIsoRefIndex[l] == spatialRef[i][j].subStruct[k].isoRefIndex)
 						fprintf(stderr, "#######  [%d][%d]  (while checking for duplication of halos...)\n",
@@ -2402,7 +2421,7 @@ analyseRef(int num_refgrids, SPATIALREF **spatialRef)
 				tmpIsoRefIndex[tmpCount] = spatialRef[i][j].subStruct[k].isoRefIndex;
 				tmpCount++;
 			}
-      
+
 		}
 		if (tmpIsoRefIndex != NULL) {
 			free(tmpIsoRefIndex);
@@ -2442,17 +2461,17 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 	double  maxGathRad, gatherRad2;
 
 	int     tmp;
-  
+
   long unsigned *idxtmp, *idx;
 	double        *fsort;
 
   time_t  tdummy;
-  
+
   idx = NULL;
 
   /* this version follows the same logic as the loops below filling halos[] with meaning */
 	count = 0;
-  
+
   /* treat 1st grid separately */
   i = 0;
   for (j = 0; j < numIsoRef[i]; j++)
@@ -2464,7 +2483,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
     else
       count += spatialRef[i][j].numSubStruct;
    }
-  
+
   /* the refinment levels */
 	for (i = 1; i < num_refgrids; i++)
    {
@@ -2550,7 +2569,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 
 		halos[i].hostHaloLevel    = -1;
 		halos[i].hostHalo         = -1;
-    
+
 #ifdef AHFnewHaloIDs
 		halos[i].haloID           = 0;
 		halos[i].hostHaloID       = 0;
@@ -2579,17 +2598,17 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 	fprintf(io.logfile, "  constructing %d (potential) halos from all %d grid levels...\n", numHalos, num_refgrids);
 	fflush(io.logfile);
 #endif
-  
+
   /*----------------------------------------------------------------------------------------
    * loop over all refinement levels building the halos[] tree from the spatialRef[][] tree
    *----------------------------------------------------------------------------------------*/
   //tdummy  = 0;
   //tdummy -= time(NULL);
-  
+
   /* we might not start on level 0 as this is the level outside the ovlim criterion
    * it makes more sense to start the halo-tree on a level "inside" the virial radius of haloes? */
   refgrid_start = 0;
-  
+
 	for (i = refgrid_start; i < num_refgrids; i++) {
 #ifdef VERBOSE
 		fprintf(stderr, "      grid level %8d (%12d) -> %10d isolated refinements ... ", i, (int)gridl1dim[i], numIsoRef[i]);
@@ -2602,7 +2621,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
      * the 1st grid encompasses ovlim and hence no halo on this level should be a subalo
      *    -> therefore, all halos[].hostHalo will be initialized to -1
      */
-   
+
 		if (i == refgrid_start) {
 			for (j = 0; j < numIsoRef[i]; j++) {
 				/******************************************************/
@@ -2612,7 +2631,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 #endif
 					/* there is no host halo */
 					halos[count].hostHalo = -1;
-          
+
 					/* halo centre (there is no finer spatialRef[][] and hence assign centre...) */
 					halos[count].pos.x = spatialRef[i][j].centre.x;
 					halos[count].pos.y = spatialRef[i][j].centre.y;
@@ -2624,7 +2643,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 
 					/* particles */
 					halos[count].npart  = spatialRef[i][j].numParts;
-          
+
 					/*  Substructure */
 					halos[count].numSubStruct = 0;
 					halos[count].subStruct    = NULL;
@@ -2642,7 +2661,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 #endif
 					/* there is no host halo */
 					halos[count].hostHalo = -1;
-          
+
 					/* do not assign centre as there is a finer refinement... */
 
 					/* particles */
@@ -2698,7 +2717,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 					/* nodes */
 					halos[count].numNodes = spatialRef[i][j].numNodes;
 
-					/*  Substructure */   
+					/*  Substructure */
 					numNewHalos               = spatialRef[i][j].numSubStruct - 1; // -1 because the daughter is also in the SubStruct list
 					halos[count].numSubStruct = numNewHalos;
           if(halos[count].subStruct) free(halos[count].subStruct);
@@ -2747,19 +2766,19 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
         }
 			} /* for(j<numIsoRef[i]) */
 		}
-    
-    
+
+
     /*------------------------------------------------
 		 * the refinement levels (i.e. i > refgrid_start)
      *------------------------------------------------*/
 		else {
 			for (j = 0; j < numIsoRef[i]; j++) {
-        
+
 				/* there is a parent refinement level */
 				if (spatialRef[i][j].numParDom != 0) {
 
 					if (spatialRef[i][j].numSubStruct == 0) {
-            
+
 						/* haloIndex is the ID of the halo correspondong to the parent refinement level,
              * i.e. we adjust its properties as we have refined information from the present refinement level */
 						haloIndex = spatialRef[i][j].haloIndex;
@@ -2833,7 +2852,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 
 						/* nodes */
 						halos[haloIndex].numNodes = spatialRef[i][j].numNodes;
-            
+
             /* BUILD 039: quick-and-dirty fix in case this halo did not ever get a position assigned */
             // BUILD 084: we should actually always update the halo position to the best resolution
             //if(halos[haloIndex].pos.x < MACHINE_ZERO && halos[haloIndex].pos.y < MACHINE_ZERO && halos[haloIndex].pos.z < MACHINE_ZERO)
@@ -2858,7 +2877,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 						/*  Substructure */
 						numNewHalos  = spatialRef[i][j].numSubStruct - 1;
 						kcount       = halos[primHaloIndex].numSubStruct; // this is the number of old substructure halos serving as a loop counter below
-          
+
 						halos[primHaloIndex].numSubStruct = kcount + numNewHalos;
 
 						if (halos[primHaloIndex].subStruct == NULL) {
@@ -2872,7 +2891,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 								exit(0);
 							}
 						}
-            
+
 						/* Collecting information for the 'new' substructure */
 						for (k = 0; k < spatialRef[i][j].numSubStruct; k++) {    // note that the substructure loop counter is kcount!
 							SSrefLevel    = spatialRef[i][j].subStruct[k].refLevel;
@@ -2904,7 +2923,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 						}
 
 						/* Assign the remaining particles to the host halo */
-						halos[haloIndex].npart += spatialRef[i][j].numParts;            
+						halos[haloIndex].npart += spatialRef[i][j].numParts;
 
           }
 				} else {
@@ -2926,7 +2945,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 				}
 			} /* for(j<numIsoRef[i]) */
 		} /* i !=0 */
-    
+
 #ifdef VERBOSE
 		fprintf(stderr, "finished\n");
 		fprintf(io.logfile, "finished\n");
@@ -2969,7 +2988,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 
   /* make this first guess of haloes globally accessible */
   simu.no_halos = numHalos;
-  
+
 	/*********************************************************************************************************
 	 *********************************************************************************************************
 	 * Ordering the halos wrt mass
@@ -2982,18 +3001,18 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 		for (i = 0; i < numHalos; i++)
 			fsort[i+1] = (double)halos[i].npart;
 		indexx(numHalos, fsort, idxtmp);
-    
+
 		/* indexx sorts ascending and gives indizes starting at 1 */
 		for (i = 0; i < numHalos; i++)
 			idx[numHalos - i - 1] = idxtmp[i + 1] - 1;
-    
+
 		free(idxtmp);
 		free(fsort);
 	} else {
 		/* If there are no halos, have a proper empty idx array */
 		idx = NULL;
 	}
- 
+
 	/*********************************************************************************************************
 	 *********************************************************************************************************
 	 * Calculate the Gathering radius:
@@ -3001,7 +3020,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 	 * the gathering radius is the distance to the closest halo that is more massive than the current halo...
    * we therefore require the halos to be ordered by npart for this part!
    */
-   
+
 	maxGathRad = MIN(simu.MaxGatherRad / simu.boxsize, 1. / 4.);
 
 #ifdef WITH_OPENMP
@@ -3009,24 +3028,24 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 #      pragma omp for schedule(dynamic)
 #endif
 	for (ii = numHalos - 1; ii >= 0; ii--) {
-    
+
     /* pick halo from ordered list */
     i = idx[ii];
-    
+
 		/* root halos do not need to gather anything from larger objects... */
     count    = 0;
 
     inumpart = halos[i].npart;
-    
+
     /* loop over all halos that are more massive... */
     //for (jj = numHalos - 1; jj >= 0; jj--) {
     for (jj = ii; jj >= 0; jj--) {
-      
+
       /* pick halo from ordered list */
       j = idx[jj];
-      
+
       jnumpart = halos[j].npart;
-      
+
       if ((i != j) && (jnumpart > inumpart)) {
         /* Calculate the distance to this more massive halo */
         dx = fabs(halos[i].pos.x - halos[j].pos.x);
@@ -3035,28 +3054,32 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
         if (dx > 0.5)		dx = 1.0 - dx;
         if (dy > 0.5) 	dy = 1.0 - dy;
         if (dz > 0.5) 	dz = 1.0 - dz;
-        
+
+        dx *= simu.anifac[0];
+        dy *= simu.anifac[1];
+        dz *= simu.anifac[2];
+
         tmpRad = dx * dx + dy * dy + dz * dz;
-        
+
         /* Is it the smallest distance */
         if (tmpRad < halos[i].gatherRad) {
           halos[i].gatherRad = tmpRad;
         }
-        
+
         count++;
       }
     }
-    
+
     /* Finally calculating the gathering radius */
     halos[i].gatherRad = (sqrt(halos[i].gatherRad)) * 0.5;
-    
+
     if (count == 0) {
 #ifdef AHFDEBUG
       fprintf(stderr, "There are no other halos bigger than this halo - should see this just once\n");
 #endif
       halos[i].gatherRad = maxGathRad;
     }
-    
+
 #ifdef AHFmaxGatherRadTest
     /* for host haloes we simply estimate the radius according to our desired virial overdensity criterion */
     if(halos[i].hostHalo < 0)
@@ -3075,12 +3098,12 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
  {
   FILE *fptmp;
   char  prename[MAXSTRING];
-  
-  
+
+
 #ifdef WITH_MPI
   fprintf(stderr,"\n MPI rank %d writing DPhalos ... ",global_mpi.rank);
 	sprintf(prename,"%s.%04d.z%.3f.AHF_DPhalos", global_io.params->outfile_prefix,global_mpi.rank,fabs(global.z));
-  
+
   if( (fptmp = fopen(prename,"w")) == NULL ) {
     fprintf(stderr,"Could not open DPhalos file %s\nABORTING\n",prename);
     common_terminate(EXIT_FAILURE);
@@ -3100,8 +3123,8 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
   }
   fprintf(fptmp,"# x(1) y(2) z(3) npart(4) ncells(5)\n");
 #endif
-  
-              
+
+
 #ifdef DPhalos_WITHCOMMENTS
 	fprintf(fptmp, "\n\n   preliminary halo properties:\n");
 	fprintf(fptmp, "   ============================\n");
@@ -3113,7 +3136,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
 #ifdef WITH_MPI
     if(halos[i].ignoreme == FALSE) {
 #endif
-      
+
 #ifdef DPhalos_WITHCOMMENTS
       fprintf(fptmp, "   halos[%d].numNodes         = %16d\n",                          i, halos[i].numNodes);
       fprintf(fptmp, "   halos[%d].npart            = %16ld\n",                         i, halos[i].npart);
@@ -3139,13 +3162,13 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
         fflush(fptmp);
       }
 #endif
-      
+
 #ifdef WITH_MPI
     } // if(ignoreme == FALSE)
 #endif
 	} // for(ii=numHalos)
   fclose(fptmp);
- 
+
   // we are not interested in anything else, right?
   fprintf(stderr,"done and exiting now.\n");
   common_terminate(EXIT_SUCCESS);
@@ -3155,7 +3178,7 @@ int spatialRef2halos(int num_refgrids, SPATIALREF **spatialRef)
   /* remove tempory index array again */
   if(idx != NULL)
     free(idx);
-  
+
 	return TRUE;
 } /* spatialRef2halos */
 
@@ -3170,28 +3193,28 @@ int WriteGridtreefile(const char *fprefix, int num_refgrids, SPATIALREF **spatia
   char filename[MAXSTRING];
   FILE *fout;
   long i,j,k;
-  
+
   /* Generate the filename */
   strcpy(filename, fprefix);
   strcat(filename, ".AHF_gridtree");
 #  ifdef VERBOSE
   fprintf(stderr, "%s\n", filename);
 #  endif
-  
+
   /* Open file */
   if ((fout = fopen(filename, "w")) == NULL) {
     fprintf(stderr, "could not open %s\n", filename);
     exit(1);
   }
-  
+
   fprintf(fout,"%d %d\n",ahf.min_ref, ahf.no_grids);
-  
+
   for(i=0; i<num_refgrids; i++) {
-    
+
     fprintf(fout,"%d %d\n",
             i + ahf.min_ref,  // write the actual level (and not the internal count)
             numIsoRef[i]);
-    
+
     for (j=0; j<numIsoRef[i]; j++) {
       fprintf(fout, "%18.14lf %18.14lf %18.14lf %18.14lf %d %ld %d %d %d\n",
               spatialRef[i][j].centre.x,
@@ -3203,7 +3226,7 @@ int WriteGridtreefile(const char *fprefix, int num_refgrids, SPATIALREF **spatia
               spatialRef[i][j].daughter.refLevel            + ahf.min_ref,  // write the actual level (and not the internal count)
               spatialRef[i][j].daughter.isoRefIndex,
               spatialRef[i][j].numSubStruct);
-      
+
       if(spatialRef[i][j].daughter.refLevel != i+1 && spatialRef[i][j].daughter.isoRefIndex != -1) {
         fprintf(stderr,"spatialRef[%d][%d].daughter.refLevel=%d != %d+1 (isoRefIndex=%d)\n",i,j,spatialRef[i][j].daughter.refLevel,i,spatialRef[i][j].daughter.isoRefIndex);
         exit(0);
@@ -3213,7 +3236,7 @@ int WriteGridtreefile(const char *fprefix, int num_refgrids, SPATIALREF **spatia
         fprintf(fout,"   %d %d\n",
                 spatialRef[i][j].subStruct[k].refLevel      + ahf.min_ref,  // write the actual level (and not the internal count)
                 spatialRef[i][j].subStruct[k].isoRefIndex);
-        
+
         if(spatialRef[i][j].subStruct[k].refLevel != i+1 && spatialRef[i][j].subStruct[k].isoRefIndex != -1) {
           fprintf(stderr,"spatialRef[%d][%d].subStruct[%d].refLevel=%d != %d+1 (isoRefIndex=%d)\n",i,j,k,spatialRef[i][j].subStruct[k].refLevel,i,spatialRef[i][j].daughter.isoRefIndex);
           exit(0);
@@ -3221,13 +3244,13 @@ int WriteGridtreefile(const char *fprefix, int num_refgrids, SPATIALREF **spatia
       }
     }
   }
-  
+
   /* Clean up */
   fclose(fout);
-  
+
   /* Done */
-  return(1);  
-}  
+  return(1);
+}
 
 /*
  ************************************************************
@@ -3286,6 +3309,12 @@ compare(struct particle *p, struct particle *q, XYZ *pointer)
 	if (dz2 > 0.5)
 		dz2 = 1.0 - dz2;
 
+    dx1 *= simu.anifac[0];
+    dx2 *= simu.anifac[0];
+    dy1 *= simu.anifac[1];
+    dy2 *= simu.anifac[1];
+    dz1 *= simu.anifac[2];
+    dz2 *= simu.anifac[2];
 
 	dist1
 	    = (dx1 * dx1 + dy1 * dy1 + dz1 * dz1) * simu.boxsize * simu.boxsize;
@@ -3364,6 +3393,10 @@ rem_nothing(HALO *halo)
 		if (dX > 0.5)			dX -= 1.0;
 		if (dY > 0.5)			dY -= 1.0;
 		if (dZ > 0.5)			dZ -= 1.0;
+
+        dX *= simu.anifac[0];
+        dY *= simu.anifac[1];
+        dZ *= simu.anifac[2];
 
 		/* finally calculate distance squared */
 		dist2 = pow2(dX) + pow2(dY) + pow2(dZ);
@@ -3487,6 +3520,10 @@ rem_unbound(HALO *halo)
 			if (dY > 0.5)	dY -= 1.0;
 			if (dZ > 0.5)	dZ -= 1.0;
 
+            dX *= simu.anifac[0];
+            dY *= simu.anifac[1];
+            dZ *= simu.anifac[2];
+
 			/* finally calculate distance (conversion to dist_phys=a*dist via phi_fac!)  */
 			dist = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
 
@@ -3496,7 +3533,7 @@ rem_unbound(HALO *halo)
                 dist*x_fac*1000.,d_prev*x_fac*1000.);
       //exit(0);
 #endif
-      
+
 			/* accumulate Phi0 */
 			if (dist > MACHINE_ZERO) {
 				/* mid-point integration */
@@ -3521,7 +3558,7 @@ rem_unbound(HALO *halo)
 		/* add the effect of scalar forces */
 		Phi0 += M_r/dist*(1.0+ simu.lrsi_beta*exp(-1.0*x_fac*dist/simu.lrsi_r_s));
 #endif
-    
+
     /* do not forget the GM/R term */
 		Phi0 += M_r / dist;
 
@@ -3607,6 +3644,10 @@ rem_unbound(HALO *halo)
 			if (dX < -0.5)			dX += 1.0;
 			if (dY < -0.5)			dY += 1.0;
 			if (dZ < -0.5)			dZ += 1.0;
+
+            dX *= simu.anifac[0];
+            dY *= simu.anifac[1];
+            dZ *= simu.anifac[2];
 
 			/* finally calculate distance (conversion to dist_phys=a*dist via phi_fac!) */
 			dist = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
@@ -3806,13 +3847,13 @@ rem_outsideRvir(HALO *halo, int icall)
 	Xc = halo->pos.x;
 	Yc = halo->pos.y;
 	Zc = halo->pos.z;
-  
+
   /* before unbinding possibly allow for a bit lower overdensity criterion and hence collecting more particles */
   if (icall == 0)
     ovdens_vir = global.ovlim;
   else
     ovdens_vir = global.ovlim;
-  
+
 
 #ifdef AHFprofilerise
 	/*============================================================================================
@@ -3885,6 +3926,10 @@ rem_outsideRvir(HALO *halo, int icall)
 				if (dY < -0.5)				dY += 1.0;
 				if (dZ < -0.5)				dZ += 1.0;
 
+                dX *= simu.anifac[0];
+                dY *= simu.anifac[1];
+                dZ *= simu.anifac[2];
+
 				/* distance of current particle (shouldn't sqrt(), but
 				 *whatever...) */
 				cur_dist = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
@@ -3947,6 +3992,10 @@ rem_outsideRvir(HALO *halo, int icall)
 		if (dY > 0.5)	dY -= 1.0;
 		if (dZ > 0.5)	dZ -= 1.0;
 
+        dX *= simu.anifac[0];
+        dY *= simu.anifac[1];
+        dZ *= simu.anifac[2];
+
 		/* radius of current sphere */
 		R_sphere = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
 
@@ -3963,7 +4012,7 @@ rem_outsideRvir(HALO *halo, int icall)
 
 	/* update halo properties (a realloc() nicely chops the ipart[] array...) */
   halo->npart = npart_sphere;
-    
+
 	halo->ipart = (long unsigned *)realloc(halo->ipart, halo->npart * sizeof(long unsigned));
 	halo->M_vir  = M_sphere;
 	halo->R_vir  = R_sphere;
@@ -4132,7 +4181,7 @@ HaloProfiles(HALO *halo)
 	double M_shell_gas;
 	double M_shell_star;
 #endif
-  
+
 
 //  double VVVx=0., VVVy=0., VVVz=0.;
 //  jpart = 0;
@@ -4146,8 +4195,8 @@ HaloProfiles(HALO *halo)
 //  VVVx /= (double)halo->npart;
 //  VVVy /= (double)halo->npart;
 //  VVVz /= (double)halo->npart;
-  
-  
+
+
 	/* only consider decent halos
 	 * NOTE: npart may have changed since the last if-statement in ConstructHalos() */
 	if (halo->npart < simu.AHF_MINPART)
@@ -4168,7 +4217,7 @@ HaloProfiles(HALO *halo)
 
 	/* create profile arrays */
 	c_profile(halo, nbins);     // &halos[i]
-  
+
 #ifdef AHFparticle_Rmax_r2
   nprofile = halo->npart;
   nignore  = AHF_Rmax_r2_NIGNORE;
@@ -4194,10 +4243,10 @@ HaloProfiles(HALO *halo)
   Mb_prev  = 0;
 	V_prev   = 0.0;
 	rad_prev = dist_min;
-  
+
   M_sphere_prev = 0.0;
   prev_dist     = 0.0;
-  
+
 	/* reset (cumulative) values based upon particles [0,cur_rad] */
 	M_sphere = 0.0;
 	VXc      = 0.0;
@@ -4318,7 +4367,7 @@ HaloProfiles(HALO *halo)
 	/* first particle */
 	jpart    = 0;
 	cur_dist = -1.0;
-  
+
 	/* loop over all bins */
 	for (ibin = 0; ibin < nbins; ibin++) {
 		/* get current outer radius using logarithmic radial bins */
@@ -4333,7 +4382,7 @@ HaloProfiles(HALO *halo)
 			 * that missing a particle could have is that the number
 			 * count of particle types is wrong which might then mess up
 			 * the writing of the output files.
-			 * The ZERO is added because the comparison is 
+			 * The ZERO is added because the comparison is
 			 * cur_dist < cur_rad  and we do want the last bin to
 			 * include the last particle (whereas for all other bins, a
 			 * particle sitting directly at a bin border would be
@@ -4393,7 +4442,7 @@ HaloProfiles(HALO *halo)
 			 *----------------------*/
 #ifdef MULTIMASS
 			weight = (double)cur_part->weight;
-      
+
       /* this expects the high resolution DM particles to have weight=AHF_HIRES_DM_WEIGHT */
       if(fabs(weight-AHF_HIRES_DM_WEIGHT)<ZERO)
         M_hires += weight;
@@ -4424,6 +4473,10 @@ HaloProfiles(HALO *halo)
 			if (dX < -0.5)			dX += 1.0;
 			if (dY < -0.5)			dY += 1.0;
 			if (dZ < -0.5)			dZ += 1.0;
+
+            dX *= simu.anifac[0];
+            dY *= simu.anifac[1];
+            dZ *= simu.anifac[2];
 
 			/* distance of current particle (shouldn't sqrt(), but whatever...) */
 			cur_dist = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
@@ -4464,12 +4517,12 @@ HaloProfiles(HALO *halo)
 			dVX = (VXp - VXc / M_sphere);
 			dVY = (VYp - VYc / M_sphere);
 			dVZ = (VZp - VZc / M_sphere);
-      
+
 			/* angular momentum of particles within sphere [0, cur_rad] (Hubble drag not relevant for angular momentum) */
 			Lx += weight * (dY * dVZ - dZ * dVY);
 			Ly += weight * (dZ * dVX - dX * dVZ);
 			Lz += weight * (dX * dVY - dY * dVX);
-      
+
 #ifndef AHFnoHubbleDrag
 			/* add Hubble flow to velocities */
 			dVX += Hubble * dX * r_fac / v_fac;
@@ -4494,22 +4547,22 @@ HaloProfiles(HALO *halo)
 				/* simply use old Phi value... */
 				Upart = (Phi - Phi0) * weight;
 			}
-      
+
 #ifdef SUSSING2013
       cur_part->E = 0.5*(Tpart*pow2(v_fac)+Upart*phi_fac)*m_fac;
       //cur_part->d = cur_dist*x_fac*1000.;
 #endif
-      
+
 #ifdef AHFDEBUG
       if(cur_dist<pre_dist)
         fprintf(stderr,"HaloProfiles: cur_dist<pre_dist   %g<%g (%ld of %ld)\n",cur_dist*x_fac*1000.,pre_dist*x_fac*1000.,npart,halo->npart);
       if(Upart>0.)
         fprintf(stderr,"HaloProfiles: positive potential  %g (%ld of %ld)\n",Upart,npart,halo->npart);
 #endif
-        
+
 			/* keep track of escape velocity */
-			v_esc2 = 2 * fabs(Upart) / weight;      
-      
+			v_esc2 = 2 * fabs(Upart) / weight;
+
 			/* take care of potential energy integration... */
 			I_prev   = I_now;
 			pre_dist = cur_dist;
@@ -4695,7 +4748,7 @@ HaloProfiles(HALO *halo)
 				Emin    = Epart;
 				mb_part = cur_part;
 			}
-      
+
 #ifdef AHFparticle_Rmax_r2
       /* accumulate radius[], Vmax2[], ovdens[], and dens_r2[] arrays */
       radius[jpart]  = cur_dist;
@@ -4715,21 +4768,21 @@ HaloProfiles(HALO *halo)
 
       prev_dist      = cur_dist;
 #endif /* AHFparticle_Rmax_r2 */
-      
+
 
 			/* jump to next particle */
 			jpart++;
-      
+
 		} /* while(cur_dist < cur_rad && jpart < halo->npart) */
 
-    
+
     /*
      * cur_rad is our set right edge of the bin, but maybe the last particle considered does not have cur_dist==cur_rad
-     * -> then it makes more sense to use the actual distance of the last particle used for the calculation! 
+     * -> then it makes more sense to use the actual distance of the last particle used for the calculation!
      */
     //cur_rad = cur_dist; // but this leads to nan's in _profiles when there are no particles in an anticipated shell :-(
-    
-    
+
+
 		/* volume of sphere [0, cur_rad] */
 		Volume = FourPiThird * pow3(cur_rad);
 
@@ -4809,7 +4862,7 @@ HaloProfiles(HALO *halo)
       halo->prof.axis2[ibin]   = 0.0;
       halo->prof.axis3[ibin]   = 0.0;
     }
-    
+
 #ifdef GAS_PARTICLES
 		halo->prof.M_gas[ibin]   = M_gas;
 		halo->prof.M_star[ibin]  = M_star;
@@ -4823,7 +4876,7 @@ HaloProfiles(HALO *halo)
 		halo->prof.Lx_star[ibin]     = Lx_star;
 		halo->prof.Ly_star[ibin]     = Ly_star;
 		halo->prof.Lz_star[ibin]     = Lz_star;
-    
+
     /* gas shape */
 #ifdef AHFshellshape
     if(ngas-ngas_prev > AHF_MINPART_SHELL)
@@ -4875,7 +4928,7 @@ HaloProfiles(HALO *halo)
       halo->prof.axis2_gas[ibin]   = 0.0;
       halo->prof.axis3_gas[ibin]   = 0.0;
     }
-    
+
     /* stellar shape */
 #ifdef AHFshellshape
     if(nstar-nstar_prev > AHF_MINPART_SHELL)
@@ -4936,11 +4989,11 @@ HaloProfiles(HALO *halo)
 #endif
 
 
-    
-    
+
+
 #ifndef AHFparticle_Rmax_r2
     /* accumulate radius[], ovdens[], Vcirc2[], and dens_r2[] arrays using binned profile */
-    radius[ibin]  = halo->prof.r[ibin];    
+    radius[ibin]  = halo->prof.r[ibin];
 		ovdens[ibin]  = halo->prof.ovdens[ibin];
 #	if (defined AHFdmonly_Rmax_r2 && defined GAS_PARTICLES)
     Vcirc2[ibin]  = (M_sphere-M_gas-M_star)/cur_rad;
@@ -4951,9 +5004,9 @@ HaloProfiles(HALO *halo)
 #endif
 #endif /* AHFparticle_Rmax_r2 */
 
-    
-    
-    
+
+
+
 		/* store values from present bin */
 		M_prev   = M_sphere;
 #ifdef GAS_PARTICLES
@@ -4988,12 +5041,12 @@ HaloProfiles(HALO *halo)
 	find_max(radius+nignore, Vcirc2+nignore, nprofile-nignore, 1, &x_max, &y_max);
 #endif
 	R_max = x_max;
-  
+
 	/* get peak height V_max of rotation curve using all matter */
   ibin=0;
   while(radius[ibin] < x_max && ibin < nprofile-1)
     ibin++;
-  
+
 #ifdef AHFparticle_Rmax_r2
   M_max = ovdens[ibin] * FourPiThird * pow3(radius[ibin]);
 #else
@@ -5005,14 +5058,14 @@ HaloProfiles(HALO *halo)
 #ifdef AHFfindRedge
 	R_edge = get_haloedge(radius, ovdens, nprofile, 1);
 #endif
-  
+
   /* free all temporary profile arrays */
 	free(ovdens);
 	free(Vcirc2);
   free(radius);
 	free(dens_r2);
-  
-  
+
+
 	/* get angular momentum */
 	Lx        = halo->prof.Lx[nbins - 1];
 	Ly        = halo->prof.Ly[nbins - 1];
@@ -5052,7 +5105,7 @@ HaloProfiles(HALO *halo)
     /* Bullock et al. (2001) spin parameter */
     halo->lambda   = absAngMom / halo->M_vir / sqrt(2. * halo->M_vir * halo->R_vir);
     halo->lambda  *= v_fac * sqrt(r_fac / (Grav * m_fac));
-    
+
     /* energy based spin parameter (ala Peebles) */
     halo->lambdaE  = calc_lambdaE(absAngMom, halo->M_vir, halo->M_vir, halo->Ekin, halo->Epot);
   } else {
@@ -5062,21 +5115,21 @@ HaloProfiles(HALO *halo)
     halo->lambda   = 0.0;
     halo->lambdaE  = 0.0;
   }
-  
+
   /* NFW concentration ala Prada et al. (2012) */
   halo->cNFW     = calc_cNFW(halo->V2_max, halo->M_vir/halo->R_vir);
-  
+
   /* surface pressure term ala Shaw et al. (2006) */
   Ts    = 2.0*(halo->prof.Ekin[nbins-1]-halo->prof.Ekin[nbins-2]);
   frad  = fabs(halo->prof.r[nbins-2]/halo->prof.r[nbins-1]);
   halo->SurfP    = -0.125*pow3(1.+frad)/(1.-pow3(frad))*Ts;;
-  
+
   /* mass fraction of high-resolution particles */
   if(M_hires>0)
-    halo->fMhires  = M_hires/(M_hires+M_lores); 
+    halo->fMhires  = M_hires/(M_hires+M_lores);
   else
-    halo->fMhires  = 0.0; 
-  
+    halo->fMhires  = 0.0;
+
   /* offset of most-bound particle from halo centre */
 	if (mb_part != NULL) {
 		dX = fabs(mb_part->pos[X] - Xc);
@@ -5085,6 +5138,9 @@ HaloProfiles(HALO *halo)
 		if (dX > 0.5)	dX -= 1.0;
 		if (dY > 0.5)	dY -= 1.0;
 		if (dZ > 0.5)	dZ -= 1.0;
+        dX *= simu.anifac[0];
+        dY *= simu.anifac[1];
+        dZ *= simu.anifac[2];
 		halo->mbp_offset = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
 		halo->pos_mbp.x  = mb_part->pos[X];
 		halo->pos_mbp.y  = mb_part->pos[Y];
@@ -5109,6 +5165,9 @@ HaloProfiles(HALO *halo)
 	if (dX > 0.5)	dX -= 1.0;
 	if (dY > 0.5)	dY -= 1.0;
 	if (dZ > 0.5)	dZ -= 1.0;
+    dX *= simu.anifac[0];
+    dY *= simu.anifac[1];
+    dZ *= simu.anifac[2];
 	halo->com_offset = sqrt(pow2(dX) + pow2(dY) + pow2(dZ));
 	halo->pos_com.x  = CoM[X];
 	halo->pos_com.y  = CoM[Y];
@@ -5145,7 +5204,7 @@ HaloProfiles(HALO *halo)
       halo->gas_only.lambda   = absAngMom / M_gas / sqrt(2. * halo->M_vir * halo->R_vir);
       halo->gas_only.lambda  *= v_fac * sqrt(r_fac / (Grav * m_fac));
       halo->gas_only.lambdaE  = calc_lambdaE(absAngMom, halo->M_vir, halo->gas_only.Mass, halo->gas_only.Ekin, halo->gas_only.Epot);
-      
+
       /* get shape of gas particles (all gas part's within sphere!) */
       itensor[0][0] = a11_gas;
       itensor[1][1] = a22_gas;
@@ -5157,7 +5216,7 @@ HaloProfiles(HALO *halo)
       itensor[1][2] = a23_gas;
       itensor[2][1] = a23_gas;
       get_axes(itensor, &axis1, &axis2, &axis3);
-      
+
       halo->gas_only.axis.x = 1.0;
       if(axis1 > 0.) {
         halo->gas_only.axis.y = sqrt(axis2 / axis1);
@@ -5177,7 +5236,7 @@ HaloProfiles(HALO *halo)
       halo->gas_only.E3.y   = itensor[1][2];
       halo->gas_only.E3.z   = itensor[2][2];
      }
-    
+
 		/* position of most bound gas particle */
 		if (mb_gas != NULL) {
 			halo->gas_only.pos_mbp.x = mb_gas->pos[X];
@@ -5226,7 +5285,7 @@ HaloProfiles(HALO *halo)
       halo->stars_only.lambda   = absAngMom / M_star / sqrt(2. * halo->M_vir * halo->R_vir);
       halo->stars_only.lambda  *= v_fac * sqrt(r_fac / (Grav * m_fac));
       halo->stars_only.lambdaE  = calc_lambdaE(absAngMom, halo->M_vir, halo->stars_only.Mass, halo->stars_only.Ekin, halo->stars_only.Epot);
-      
+
       /* get shape of gas particles (all gas part's within sphere!) */
       itensor[0][0] = a11_star;
       itensor[1][1] = a22_star;
@@ -5238,7 +5297,7 @@ HaloProfiles(HALO *halo)
       itensor[1][2] = a23_star;
       itensor[2][1] = a23_star;
       get_axes(itensor, &axis1, &axis2, &axis3);
-      
+
       halo->stars_only.axis.x = 1.0;
       if(axis1 > 0.) {
         halo->stars_only.axis.y = sqrt(axis2 / axis1);
@@ -5441,6 +5500,10 @@ HaloProfilesPhaseSpace(HALO *halo)
 			if (y > 0.5)				y -= 1.0;
 			if (z > 0.5)				z -= 1.0;
 
+            x *= simu.anifac[0];
+            y *= simu.anifac[1];
+            z *= simu.anifac[2];
+
 			/* Get the distance from the center */
 			cur_dist = sqrt(x * x + y * y + z * z);
 
@@ -5476,6 +5539,10 @@ HaloProfilesPhaseSpace(HALO *halo)
 				if (x > 0.5)					x -= 1.0;
 				if (y > 0.5)					y -= 1.0;
 				if (z > 0.5)					z -= 1.0;
+
+                x *= simu.anifac[0];
+                y *= simu.anifac[1];
+                z *= simu.anifac[2];
 
 				/* Used for the Hubble flow correction */
 				tmp = Hubble * r_fac / v_fac;
@@ -5558,6 +5625,10 @@ HaloProfilesPhaseSpace(HALO *halo)
 				if (x > 0.5)					x -= 1.0;
 				if (y > 0.5)					y -= 1.0;
 				if (z > 0.5)					z -= 1.0;
+
+                x *= simu.anifac[0];
+                y *= simu.anifac[1];
+                z *= simu.anifac[2];
 
 				/* Used for the Hubble flow correction */
 				tmp = Hubble * r_fac / v_fac;
@@ -5642,17 +5713,17 @@ HaloProfilesDisk(HALO *halo)
 	double  dx, dy, dz;
 	double  dvx, dvy, dvz;
 	long    jpart;
-  
+
   double  k_gas, k_star;
   double  Lx, Ly, Lz, Lzz;
-  
+
   double  Lx_gas_bin, Ly_gas_bin, Lz_gas_bin, absL_gas_bin;
   double  Lx_star_bin, Ly_star_bin, Lz_star_bin, absL_star_bin;
-  
+
 	/* Don't do it for haloes too small */
 	if (halo->npart < simu.AHF_MINPART)
 		return TRUE;
-  
+
 	/* Get the halo restframe */
 	Xc  = halo->pos.x;
 	Yc  = halo->pos.y;
@@ -5660,64 +5731,64 @@ HaloProfilesDisk(HALO *halo)
 	VXc = halo->vel.x;
 	VYc = halo->vel.y;
 	VZc = halo->vel.z;
-  
-  
+
+
 	/* how many bins from where to where for density profile? */
 	binning_parameter(*halo, &nbins, &dist_min, &dist_max);
   if(nbins != halo->prof.nbins) {
     fprintf(io.logfile, "    HaloProfilesDisk():     nbins=%d vs. halo->nbins=%d THIS SHOULD NOT HAPPEN! INVESTIGATE!\n",nbins,halo->prof.nbins);
-    fflush(io.logfile);    
+    fflush(io.logfile);
   }
-  
+
 	/* logarithmical binning from dist_min to dist_max */
 	ldist_min = log10(dist_min);
 	ldist_max = log10(dist_max);
 	ldr       = (ldist_max - ldist_min) / (double)nbins;
-  
+
 	/* Reset all quantities in the sphere */
   k_gas    = 0.0;
   k_star   = 0.0;
 	cur_dist = -1.0;
 	jpart    = 0;
-  
+
   /*====================
    * loop over all bins
    *====================*/
 	for (ibin = 0; ibin < nbins; ibin++) {
 
 		lcur_rad  = ldist_min + ((double)ibin + 1) * ldr;
-		cur_rad   = pow(10., lcur_rad);    
-    
+		cur_rad   = pow(10., lcur_rad);
+
     Lx_gas_bin    = halo->prof.Lx_gas[ibin];
     Ly_gas_bin    = halo->prof.Ly_gas[ibin];
     Lz_gas_bin    = halo->prof.Lz_gas[ibin];
     absL_gas_bin  = sqrt(pow2(Lx_gas_bin)+pow2(Ly_gas_bin)+pow2(Lz_gas_bin));
-    
+
     Lx_star_bin   = halo->prof.Lx_star[ibin];
     Ly_star_bin   = halo->prof.Ly_star[ibin];
     Lz_star_bin   = halo->prof.Lz_star[ibin];
     absL_star_bin = sqrt(pow2(Lx_star_bin)+pow2(Ly_star_bin)+pow2(Lz_star_bin));
-    
+
     /*========================================
      * loop over all particles in present bin
      *========================================*/
 		while (cur_dist < cur_rad && jpart < halo->npart) {
-      
+
 			/* Access particle */
 			cur_part = global.fst_part + halo->ipart[jpart];
-      
+
       /* Get particle mass */
 #ifdef MULTIMASS
       weight = cur_part->weight;
 #else
       weight = 1.0;
 #endif
-      
+
 			/* Get particle position in halo rest-frame */
 			dx = ((double)cur_part->pos[X]) - Xc;
 			dy = ((double)cur_part->pos[Y]) - Yc;
 			dz = ((double)cur_part->pos[Z]) - Zc;
-      
+
 			/* Correct for periodic boundary */
 			if (dx < -0.5)			dx += 1.0;
 			if (dy < -0.5)			dy += 1.0;
@@ -5725,17 +5796,21 @@ HaloProfilesDisk(HALO *halo)
 			if (dx > 0.5)				dx -= 1.0;
 			if (dy > 0.5)				dy -= 1.0;
 			if (dz > 0.5)				dz -= 1.0;
-      
+
+            dx *= simu.anifac[0];
+            dy *= simu.anifac[1];
+            dz *= simu.anifac[2];
+
       /* Get particle velocity in halo rest-frame */
       dvx = ((double)cur_part->mom[X]) - VXc;
       dvy = ((double)cur_part->mom[Y]) - VYc;
       dvz = ((double)cur_part->mom[Z]) - VZc;
-      
+
       // as we are only dealing with angular momentum here, there is no need for the Hubble term as it just leads to cross(r,r)=0
-      
+
 			/* Get the distance from the center */
 			cur_dist = sqrt(pow2(dx) + pow2(dy) + pow2(dz));
-      
+
 			/*==============
 			 * GAS PARTICLE
 			 *==============*/
@@ -5744,7 +5819,7 @@ HaloProfilesDisk(HALO *halo)
         Lx = weight * (dy * dvz - dz * dvy);
         Ly = weight * (dz * dvx - dx * dvz);
         Lz = weight * (dx * dvy - dy * dvx);
-        
+
         if(absL_gas_bin > 0.) {
           Lzz = (Lx*Lx_gas_bin + Ly*Ly_gas_bin + Lz*Lz_gas_bin)/absL_gas_bin;
         }
@@ -5755,7 +5830,7 @@ HaloProfilesDisk(HALO *halo)
         if (cur_dist > MACHINE_ZERO)
           k_gas += pow2(Lzz/cur_dist) / weight;
        }
-      
+
       /*===============
 			 * STAR PARTICLE
 			 *===============*/
@@ -5771,7 +5846,7 @@ HaloProfilesDisk(HALO *halo)
         else {
           Lzz = 0.;
         }
-        
+
         if (cur_dist > MACHINE_ZERO)
           k_star += pow2(Lzz/cur_dist) / weight;
       }
@@ -5783,13 +5858,13 @@ HaloProfilesDisk(HALO *halo)
       /* move to next particle */
       jpart++;
 		}
-    
+
     /* store k(<R_ibin) values in halo profile */
     halo->prof.k_gas[ibin]  = 0.5 * k_gas;
     halo->prof.k_star[ibin] = 0.5 * k_star;
-    
+
 	} /* End of for-loop over the bins */
-  
+
 	return TRUE;
 }
 #endif
@@ -5892,10 +5967,10 @@ sort_halo_particles(HALO *halo)
 	long unsigned *idx;
 	long unsigned *ipart;
 	partptr       cur_part;
-    
+
 	if (halo->npart < simu.AHF_MINPART)
       return;
-  
+
 #ifdef VERBOSE2
 	fprintf(io.logfile,
 	        "    sort_particles:      npart=%12ld => ", halo->npart);
@@ -5906,29 +5981,29 @@ sort_halo_particles(HALO *halo)
 	Yc    = halo->pos.y;
 	Zc    = halo->pos.z;
 	npart = halo->npart;
-  
+
 
 	ipart = (long unsigned *)calloc(npart, sizeof(long unsigned));
 	idx   = (long unsigned *)calloc(npart + 1, sizeof(long unsigned));
 	dist  = (double *)calloc(npart + 1, sizeof(double));
-  
+
 
 	/* fill dist[] array with dR^2 */
 	for (i = 0; i < npart; i++) {
-		
+
     /* access to particle */
 		cur_part = global.fst_part + halo->ipart[i];
-    
+
 		/* particle position */
 		Xp = (double)cur_part->pos[X];
 		Yp = (double)cur_part->pos[Y];
 		Zp = (double)cur_part->pos[Z];
-    
+
 		/* put particle into halo rest frame */
 		dX = (Xp - Xc);
 		dY = (Yp - Yc);
 		dZ = (Zp - Zc);
-    
+
 		/* take care of periodic boundary conditions */
 		if (dX > 0.5)			dX -= 1.0;
 		if (dY > 0.5)			dY -= 1.0;
@@ -5936,35 +6011,39 @@ sort_halo_particles(HALO *halo)
 		if (dX < -0.5)		dX += 1.0;
 		if (dY < -0.5)		dY += 1.0;
 		if (dZ < -0.5)		dZ += 1.0;
-    
+
+        dX *= simu.anifac[0];
+        dY *= simu.anifac[1];
+        dZ *= simu.anifac[2];
+
 		/* distance^2 of current particle */
 		dR          = (pow2(dX) + pow2(dY) + pow2(dZ));
-    
+
 		dist[i + 1] = dR;
 	}
-  
+
 	/* sort particles according to dist[] */
 	indexx(npart, dist, idx);
-  
-  
+
+
 	/* generate an ordered array ... */
 	for (i = 0; i < npart; i++)
 		ipart[i] = halo->ipart[idx[i + 1] - 1];
-  
-  
+
+
 	/* ... and replace halo.ipart[] */
 	for (i = 0; i < npart; i++)
 		halo->ipart[i] = ipart[i];
-  
+
 	free(idx);
 	free(dist);
 	free(ipart);
-  
+
 #ifdef VERBOSE2
 	Xc = halo->pos.x;
 	Yc = halo->pos.y;
 	Zc = halo->pos.z;
-  
+
 	for (i = 0; i < 1; i++) {
 		cur_part = global.fst_part + halo->ipart[i];
 		Xp       = (double)cur_part->pos[X];
@@ -5979,8 +6058,11 @@ sort_halo_particles(HALO *halo)
 		if (dX < -0.5) dX += 1.0;
 		if (dY < -0.5) dY += 1.0;
 		if (dZ < -0.5) dZ += 1.0;
+        dX *= simu.anifac[0];
+        dY *= simu.anifac[1];
+        dZ *= simu.anifac[2];
 		dR = (pow2(dX) + pow2(dY) + pow2(dZ));
-    
+
 #ifdef VERBOSE2
 		fprintf(io.logfile, "dR_min = %16.8g kpc/h\n", sqrt(dR) * x_fac * 1000.);
 		fflush(io.logfile);
@@ -5988,7 +6070,7 @@ sort_halo_particles(HALO *halo)
 		/*  fprintf(stderr,"dR[%ld] = %16.8g kpc/h\n",i,sqrt(dR)*x_fac*1000.); */
 	}
 #endif
-  
+
 	Xc = halo->pos.x;
 	Yc = halo->pos.y;
 	Zc = halo->pos.z;
@@ -6001,14 +6083,17 @@ sort_halo_particles(HALO *halo)
 boolean check_subhalo(HALO *host, HALO *sub)
 {
   double dx,dy,dz;
-  
+
   dx = fabs(host->pos.x - sub->pos.x);
   dy = fabs(host->pos.y - sub->pos.y);
   dz = fabs(host->pos.z - sub->pos.z);
   if(dx > 0.5) dx=1.-dx;
   if(dy > 0.5) dy=1.-dy;
   if(dz > 0.5) dz=1.-dz;
-  
+  dx *= simu.anifac[0];
+  dy *= simu.anifac[1];
+  dz *= simu.anifac[2];
+
   /* we add it to the subhalo list as soon as the two radii overlap */
   if(pow2(dx)+pow2(dy)+pow2(dz) < pow2(host->R_vir + AHF_HOSTSUBOVERLAP*sub->R_vir) && sub->npart >= simu.AHF_MINPART && host->npart >= simu.AHF_MINPART)
     return(TRUE);
@@ -6136,9 +6221,9 @@ flag_boundary_haloes(void)
 	int         level;
 	int         k;
 	int         new_numHalos = 0;
-  
+
 	io_logging_msg(global_io.log, INT32_C(0), "\nFiguring out which halo can be ignored.");
-  
+
 #  ifdef AHFrestart
 	minkey = global_info.minkey;
 	maxkey = global_info.maxkey;
@@ -6150,7 +6235,7 @@ flag_boundary_haloes(void)
 	ctype  = global_info.loadbal->ctype;
 	level  = global_info.loadbal->level;
 #  endif
-  
+
 	/* Loop over all halos and figure out which should be used */
 #ifdef WITH_OPENMP
 #  pragma omp parallel for                \
@@ -6172,7 +6257,7 @@ reduction (+:new_numHalos)
 		                         BITS_PER_DIMENSION,
 		                         ctype,
 		                         key);
-    
+
 		/* Check if it is with our key range */
 		if ((key >= minkey) && (key <= maxkey)) {
 			halos[i].ignoreme = FALSE;
@@ -6209,20 +6294,20 @@ void exciseSubhaloStars(HALO *halos, long ihost)
   long *ipart_uniquestars;
   long unsigned nhoststar, nsubstar, k, khoststar, ksubstar, isub, i, npart_uniquestars;
 	partptr       cur_part;
-  
+
   /* only excise stars if there is substructure present */
   if(halos[ihost].numSubStruct > 0) {
-    
+
     /* allocate temporary arrays (one malloc() for an array big enough to hold everything) */
     nhoststar  = halos[ihost].stars_only.npart;
-    
+
     idhoststar = (long *) malloc(nhoststar*sizeof(long));
     idsubstar  = (long *) malloc(nhoststar*sizeof(long));
     if(idsubstar == NULL || idhoststar == NULL) {
       fprintf(stderr, "Not enough memory to allocate arrays in %s.  Aborting.\n\n", __func__);
       common_terminate(EXIT_FAILURE);
     }
-    
+
     /* copy host star particle IDs over to temporary array */
     khoststar = 0;
     for(k=0; k<halos[ihost].npart; k++) {
@@ -6237,19 +6322,19 @@ void exciseSubhaloStars(HALO *halos, long ihost)
       fprintf(stderr,"exciseSubhaloStars(1): number of stars in host does not add up: khoststar=%ld nhoststar=%ld\n",khoststar,nhoststar);
       common_terminate(EXIT_FAILURE);
     }
-    
-    
+
+
     /* copy all subhalo star particle IDs over to temporary array */
     ksubstar = 0;
     for(i=0; i<halos[ihost].numSubStruct; i++) {
       isub = halos[ihost].subStruct[i];
-      
+
       for(k=0; k<halos[isub].npart; k++) {
         cur_part = global.fst_part + halos[isub].ipart[k];
         if(fabs(cur_part->u - PSTAR) < ZERO) {
           idsubstar[ksubstar] = cur_part - global.fst_part;
           ksubstar++;
-          
+
           // just in case all subhaloes combined contain more stars than the host (this can happen if there are sub-subhaloes present!)
           if(ksubstar >= nhoststar)
             idsubstar = (long *) realloc(idsubstar, (ksubstar+1)*sizeof(long));
@@ -6257,7 +6342,7 @@ void exciseSubhaloStars(HALO *halos, long ihost)
       }
     }
     nsubstar = ksubstar;
-    
+
     /* the subhaloes contain stars */
     if(nsubstar > 0)
      {
@@ -6268,59 +6353,59 @@ void exciseSubhaloStars(HALO *halos, long ihost)
         fprintf(stderr, "Not enough memory to re-allocate arrays in %s (nhoststar=%ld, nsubstar=%ld).  Aborting.\n\n", __func__,nhoststar,nsubstar);
         common_terminate(EXIT_FAILURE);
       }
-      
+
       /* qsort both idhoststar[] and idsubstar[] arrays */
       qsort((void *)idhoststar, nhoststar, sizeof(long), id_comp);
       qsort((void *)idsubstar,  nsubstar,  sizeof(long), id_comp);
-      
+
       /* check every single host star for being in a subhalo */
       npart_uniquestars  = 0;
       ipart_uniquestars  = (long *) malloc(nhoststar*sizeof(long));
       for(k=0; k<nhoststar; k++) {
-        
+
         /* host star id cannot be found in subhalo list -> keep it! */
         if(bsearch(&(idhoststar[k]), idsubstar, nsubstar, sizeof(long), id_comp) == NULL) {
           ipart_uniquestars[npart_uniquestars] = idhoststar[k];
           npart_uniquestars++;
         }
-        
+
       }
       /* free excess memory in ipart_uniquestars[] array */
       ipart_uniquestars = (long *) realloc(ipart_uniquestars, npart_uniquestars*sizeof(long));
-      
+
       /* store informaion in host halo structure */
       halos[ihost].npart_uniquestars = npart_uniquestars;
       halos[ihost].ipart_uniquestars = ipart_uniquestars;
-      
+
       /* free both temporary arrays again */
       free(idsubstar);
       free(idhoststar);
      }
-    
+
     /* the subhaloes do not contain any stars */
     else
      {
       /* simply use all host stars */
       halos[ihost].npart_uniquestars = nhoststar;
       halos[ihost].ipart_uniquestars = idhoststar;
-      
+
       /* free temporary array again (do not free idhoststar as it has to be kept alive!) */
       free(idsubstar);
      }
-    
+
   } // if(numSubStruct>0)
-  
+
   /* if there is no substructure, simply copy all stars over to 'uniquestars' */
   else {
     /* there is no substructure but we need to copy the star particles over to the "unique" array anyways! */
     halos[ihost].npart_uniquestars = halos[ihost].stars_only.npart;
     halos[ihost].ipart_uniquestars = (long *) malloc(halos[ihost].stars_only.npart*sizeof(long));
-    
+
     if(halos[ihost].ipart_uniquestars == NULL) {
       fprintf(stderr, "Not enough memory to allocate array in %s (halos[ihost].stars_only.npart=%ld).  Aborting.\n\n", __func__,halos[ihost].stars_only.npart);
       common_terminate(EXIT_FAILURE);
     }
-    
+
     khoststar = 0;
     for(k=0; k<halos[ihost].npart; k++) {
       cur_part = global.fst_part + halos[ihost].ipart[k];
@@ -6329,7 +6414,7 @@ void exciseSubhaloStars(HALO *halos, long ihost)
         khoststar++;
       }
     }
-    
+
     /* double-check number of star particles */
     if(khoststar != halos[ihost].stars_only.npart) {
       fprintf(stderr,"exciseSubhaloStars(2): number of stars in host does not add up: khoststar=%ld halos[ihost].stars_only.npart=%ld\n",khoststar,halos[ihost].stars_only.npart);
@@ -6337,7 +6422,7 @@ void exciseSubhaloStars(HALO *halos, long ihost)
     }
 
   }
-  
+
   // update Mstar_excised
   halos[ihost].Mstar_excised = 0.0;
   for(i=0; i<halos[ihost].npart_uniquestars; i++) {
@@ -6346,7 +6431,7 @@ void exciseSubhaloStars(HALO *halos, long ihost)
     halos[ihost].Mstar_excised         += cur_part->weight;
   }
   halos[ihost].mean_z_star_excised /= halos[ihost].Mstar_excised;
-  
+
 }
 #endif /* AHFexciseSubhaloStars */
 

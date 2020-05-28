@@ -35,19 +35,19 @@ typedef uint64_t part_id_t;
 typedef struct particle *partptr;
 typedef struct particle
 {
-  /* linked-list coord  
-   *    :- NOTE -: 
+  /* linked-list coord
+   *    :- NOTE -:
    * for the linkedlist sort to work this element *must* be first in the struct
    */
   partptr ll;
-  
-  
+
+
   flouble   pos[NDIM];                	/* position vector             */
   flouble   mom[NDIM];                	/* momentum vector             */
 #ifdef MULTIMASS
   flouble   weight;                    /* weight of particle          */
 #endif
-    
+
   sfc_key_t sfckey;
 
 #if (!(defined AHF_NO_PARTICLES && defined AHFlean))
@@ -55,21 +55,21 @@ typedef struct particle
 #endif
 #if (defined GAS_PARTICLES)
   flouble    u;
-#endif 
-  
+#endif
+
 #if (defined METALHACK)
   flouble    z;
   flouble    age;
 #endif
-  
+
 #ifdef DEVA
   long itype;
 #endif
-  
+
 #ifdef SUSSING2013
   flouble E;
 #endif
-  
+
 #ifdef STORE_MORE
   flouble rho;
   flouble eps;
@@ -114,7 +114,7 @@ typedef struct node
 #endif
   flouble  dens;                  /* mass density                         */
   partptr  ll;              	    /* head of particle linked-list         */
-  
+
   /*
    * The forces at the node are only required at the end of a timestep.
    * Hence the space allocated to the forces is used to store temporary
@@ -132,7 +132,7 @@ typedef struct node
   partptr  new_ll;             /* pointer for rebuilding linked list      */
   int      colour;             /* used with -DAHF                         */
  }force;
-  
+
 }node;
 
 
@@ -191,29 +191,29 @@ typedef struct gridlist
   pqptr   pquad;                 /* pointer to first pquad on grid           */
   long    no_pquad;              /* how many pquad's are there?              */
   pqptr  *pquad_array;           /* align pquads in memory when using OpenMP */
-  
+
   long unsigned    l1dim;        /* virtual grid length                      */
   double  spacing;               /* grid spacing                             */
   double  spacing2;              /* grid spacing squared                     */
   double  critdens;              /* critical density on this grid            */
   double  masstodens;            /* mass to density conversion factor        */
   double  masstopartdens;        /* mass to partdens converion factor        */
-  
+
   double  old_resid;             /* old residual                             */
   double  cur_resid;             /* current residual                         */
   double  trunc_err;             /* the truncation error                     */
   long    no_sweeps;             /* number of sweeps done on grid            */
-  
+
   double  timecounter;           /* integration variable                     */
   double  timestep;              /* current timestep for integration variable*/
   int     multistep;             /* keep track of current multistep-phase    */
-  
+
   struct  grid_size
  {
   long unsigned   no_part;     /* number of particles linked to grid       */
   long unsigned   no_nodes;    /* number of nodes actually present         */
  }size;
-  
+
   struct  grid_time
  {
   time_t potential;             /* deriving the potenital by GS sweeps      */
@@ -222,16 +222,16 @@ typedef struct gridlist
   time_t grid;                  /* everything related to grid hierarchy     */
   time_t hydro;                 /* time spent for the hydro-solver          */
  }time;
-    
+
   boolean  next;                  /* the grid structure is never destroyed    */
-  
+
 #ifdef WITH_MPI
 	/** Number of boundary nodes*/
 	uint32_t num_bound;
 	/** The boundary nodes */
 	nptr bound;
 #endif
-  
+
 }gridls;
 
 /*=============================================================================
@@ -242,7 +242,7 @@ typedef struct info_global
   /* access to the domain grid */
   gridls *dom_grid;      /* actual pointer to domain grid strcuture             */
   int     domgrid_no;    /* locate domain grid within grid_list                 */
-  
+
   /* access to all particles currently in use (NOTE: global.no_part is not necessarily equal to simu.no_part!) */
   partptr       fst_part;
   long unsigned no_part;       /* here we store the actual number of particles        */
@@ -250,46 +250,46 @@ typedef struct info_global
   gasptr        fst_gas;
   long unsigned no_gas;        /* how many gas particles               */
   long          offset_gas;    /* for those input files that contain gas particles         */
-  
+
   starptr       fst_star;
   long unsigned no_stars;      /* how many star particls               */
   long          offset_stars;  /* for those input files that contain gas particles         */
-  
-  
+
+
   /* access to current timecounter */
   double  a;
   double  t;
   double  z;
   double  super_t;
   int     no_timestep;
-  
+
   long    fin_l1dim;     /* finest refinement level reached per domain cycle    */
   boolean fst_cycle;
-      
+
   int     output_count;
   boolean restart;
-  
+
   double  total_time;
-  
+
   double  bytes_node;
   double  bytes_part;
-  
+
   boolean       terminate;    /* flag that terminates code after current step     */
   char         *termfile_name;
-  
+
   int           architecture; /* little or big endian machine                     */
-  
+
   long unsigned ndummy;
   double        fdummy;
-  
-  
+
+
   double  ovlim;         /* virial overdensity parameter                             */
   double  rho_b;         /* stores comoving(!) background density                    */
   double  rho_vir;       /* stores comoving(!)   virial   density                    */
   double  max_ovdens;    /* maximum overdensity possible with currrent AMR hierarchy */
-  
+
   int     ioflag;        /* flag that indicates that we wrote an output file         */
-  
+
 } info_global;
 
 /*=============================================================================
@@ -315,6 +315,7 @@ typedef struct tline
 typedef struct param_simu
 {
   /* user supplied values */
+  double        anifac[3];
   int           NGRID_DOM;
   int           NGRID_MAX;
   double        Nth_dom;
@@ -325,7 +326,7 @@ typedef struct param_simu
   int           lb_level;
   double        AHF_VTUNE;
   int           AHF_MINPART;
-  
+
   double        GADGET_m2Msunh;
   double        GADGET_l2Mpch;  // the GADGET units
 
@@ -333,13 +334,13 @@ typedef struct param_simu
   double         GIZMO_m2Msunh;
   double         GIZMO_l2Mpch;  // the GIZMO units
 #endif
-  
+
   /* cosmological information */
   double        omega0;
   double        lambda0;
-  tline         timeline;   
-  
-  
+  tline         timeline;
+
+
   /* timestepping information */
   double        a_initial;
   double        a_final;
@@ -349,22 +350,22 @@ typedef struct param_simu
   double        t_final;
   double        super_t_initial;
   double        super_t_final;
-  
-  
+
+
   /* unit stuff */
   double        mean_dens;
   double        FourPiG;       /* 4piG factor when using -DISOLATED    */
   double        boxsize;       /* the size of the cosmological box     */
   double        pmass;         /* mass of a single particle            */
   double        t_unit;        /* the time unit                        */
-  
+
   double        l_unit;        /* currently boxsize and pmass are the units...          */
   double        m_unit;        /* ...but at some stage this should be clearly separated */
-  
+
   double        pos_shift[3];  /* keep track of any shifts and scaling */
   double        pos_scale;     /* applied to the positions             */
-  
-  
+
+
   /* HYDRO information */
   double        gamma;        /* adiabatic index for equation-of-state */
   double        omegab;       /* baryonic matter content               */
@@ -374,40 +375,40 @@ typedef struct param_simu
   double        T_init;       /* initial gas temperature               */
   double        B_init;
   double        e_init;       /* initial internal energy density       */
-  
-  
+
+
   /* numerical details */
   double        no_vpart;      /* virtual number of particles          */
   long unsigned no_part;       /* real (physical) number of particles  */
   long unsigned no_species;    /* number of different particle species */
   long unsigned no_gas;        /* how many gas particles               */
   long unsigned no_stars;      /* how many star particls               */
-  
-  
+
+
   long unsigned no_halos;      /* number of halos (used by AHF)  */
-  
+
   int           NGRID_MIN;
   double        SHIFT;
-  double        min_weight;    /* minimum particle mass in internal units     */ 
+  double        min_weight;    /* minimum particle mass in internal units     */
   double        max_weight;    /* maximum particle mass in internal units     */
   double        med_weight;
   int           np_limit;
-  
+
   int           mmfocus;
   int           multi_mass;
   int           double_precision;
   int           hydro;
   int           magneto;
-    
+
 #ifdef AHF_LRSI
   double lrsi_beta;
   double lrsi_r_s;
 #endif
-  
+
 #if (defined AHFmixHaloIDandSnapID || SUSSING2013)
   uint64_t isnap;
 #endif
-  
+
 } param_simu;
 
 /*=============================================================================
@@ -418,8 +419,8 @@ typedef struct info_io
   /*------------------------------------------------------------------------
    * this first block is filled by copying the appropriate user_data!
    *------------------------------------------------------------------------*/
-  
-  
+
+
   /*------------------------------------------------------------------------
    * information for managing input and output files
    *   - filenames
@@ -427,13 +428,13 @@ typedef struct info_io
    *   - no. of output files and their respective expansion factors
    *------------------------------------------------------------------------*/
   FILE         *logfile;
-  
+
   char         *icfile_name;           /* name of file with IC's             */
   char         *outfile_prefix;        /* prefix for output files            */
   char         *dumpfile_name;         /* name of dump file                  */
   char         *logfile_name;          /* name for log file                  */
-  
-  
+
+
   /*-------------------------------------------------------------------------------------------------
    * here we store the particles that are being read in from the input file
    *
@@ -446,25 +447,25 @@ typedef struct info_io
    * fst_star is an array of length no_stars that holds >>additional<< information for stars
    * (NOTE: the mass/weight is stored in fst_part[offset_gas+offset_stars -> offset_gas+offset_gas+no_stars-1]
    *------------------------------------------------------------------------------------------------*/
-  
-  
+
+
   /* here we store the particles read in from file (no_part is stored in io.header, too!) */
   partptr       fst_part;      // fst_part gives access to >>all<< particles
   long unsigned no_part;       // = no_DMpart + no_gas + no_stars
-  
+
   gasptr        fst_gas;       // additional information other than mass for gas particles
   long unsigned no_gas;
   long          offset_gas;    // offset in fst_part[] to access gas particles
-  
+
   starptr       fst_star;      // additional information other than mass for star particles
   long unsigned no_stars;
   long          offset_stars;  // offset in fst_part[] to access gas particles
-  
-  
+
+
   /*----------------------------------------------------------------------------
    *                            AMIGA file header
    *
-   * here we store information that is relevant for 
+   * here we store information that is relevant for
    *  - restarting a simulation
    *  - obtaining information about the status of the simulation
    *    at the time the output file was written
@@ -480,36 +481,36 @@ typedef struct info_io
   struct io_header_block
  {
   char          header[HEADERSTRING];    // a string at your disposal ;-)
-  
+
   int           multi_mass;
   int           double_precision;        // remember previous settings
-  
+
   long unsigned no_part;                 // this is the total number of particles (=DM+gas+stars)
   long unsigned no_species;
   double        no_vpart;                // information about particles (cf. min/max_weight below!)
-  
+
   double        timestep;
   int           no_timestep;             // stage of simulation and last timestep used
-  
+
   double        boxsize;                 // [length unit]
   double        omega0;
   double        lambda0;                 // information about the cosmological model
-  
+
   double        pmass;                   // [mass unit]
-  
+
   double        cur_reflevel;
   double        cur_frcres;              // information about currently finest refinement level
-  
+
   double        a_initial;               // for historical reasons we store the expansion factor a
   double        a_current;               // rather than supercomoving time in the input/output file
-  
+
   double        K_initial;
   double        K_current;
   double        U_initial;
   double        U_current;
   double        Eintegral;
   double        Econst;                  // needed for layzer_irvine() energy check
-  
+
   double        paramNSTEPS;
   double        paramNGRID_DOM;
   double        paramNth_dom;
@@ -521,13 +522,13 @@ typedef struct info_io
   double        paramMAX_L1DIM;
   double	      paramDOMSWEEPS;
   double        paramREFSWEEPS;          // technical details
-  
+
   double        paramAHF_MINPART;
   double		    paramAHF_VTUNE;
   double        paramAHF_RISE;
   double        paramAHF_SLOPE;
   double        paramAHF_MAXNRISE;       // technical details about AHF
-  
+
   double        min_weight;
   double        max_weight;
   double        t_unit;
@@ -536,23 +537,23 @@ typedef struct info_io
   double        param_dummy6;
   double        param_dummy7;
   double        param_dummy8;            // empty space that once was used (downwards compatibility!)
-  
+
   double        version;
   int           build;                   // the code is under constant development ;-)
-  
+
   double        omegab;
   double        gamma;
   double        H_frac;
   double        T_init;                  // relevant for the HYDRO solver
-  
+
   int           hydro;
   int           magneto;
-  
+
   double        med_weight;
-  
+
   char          dummy[FILLHEADER];       // empty space for future additions (e.g. MHD, ...)
  } header;
-  
+
 } info_io;
 
 
@@ -615,7 +616,7 @@ typedef struct {
   double         *E3x;
   double         *E3y;
   double         *E3z;
-  
+
 #ifdef GAS_PARTICLES
   double *M_gas;
   double *M_star;
@@ -657,7 +658,7 @@ typedef struct {
   double *E3z_star;
 #endif /* AHFdisks */
 #endif /* GAS_PARTICLES */
-  
+
 #ifdef METALHACK
   double *z_gas;
   double *z_star;
@@ -689,7 +690,7 @@ typedef struct {
 
 
 /* the HALO structure */
-typedef struct {   
+typedef struct {
   /*--------------------------------
    * access to the halo's particles
    *--------------------------------*/
@@ -704,7 +705,7 @@ typedef struct {
   double         Mstar_excised;
   double         mean_z_star_excised;
 #endif
-    
+
   /*----------------------------
    * integral properties
    *----------------------------*/
@@ -734,14 +735,14 @@ typedef struct {
   XYZ     E1;            /* all the moment of inertia stuff                              */
   XYZ     E2;
   XYZ     E3;
-  double  fMhires;       /* fraction of hi-res to all DM particles                       */ 
+  double  fMhires;       /* fraction of hi-res to all DM particles                       */
   double  cNFW;          /* NFW concentration according to Eq.(9) in Prada et al. (2012) */
   double  R_edge;        /* ignore this quantity!                                        */
 
 #ifdef METALHACK
   double mean_z_gas;     /* mean metallicity of the gas particles                        */
   double mean_z_star;    /* mean metallicity of the star particles                       */
-#endif    
+#endif
 
 #ifdef GAS_PARTICLES
 #ifndef AHFaddDMonlyproperties
@@ -750,32 +751,32 @@ typedef struct {
   SPECIESPROP gas_only;  /* some integral quantities based upon gas particles only       */
   SPECIESPROP stars_only;/* some integral quantities based upon star particles only      */
 #endif
-  
-  
+
+
   /*----------------------------
    * the halo profile
    *----------------------------*/
   HALOPROFILE prof;
-  
-  
+
+
   /*----------------------------
    * halo-tree information
-   *----------------------------*/  
+   *----------------------------*/
   int hostHalo;          /* Index to the halo that hosts this one based on the grids          */
   int hostHaloLevel;     /* keeps track on which level the host halo was assigned             */
   int numSubStruct;      /* number of subhalos                                                */
   int	*subStruct;	  	   /* indizes of the substructure halos                                 */
-  
+
   double gatherRad;      /* radius used to gather initial set of particles                    */
-  double spaRes;         /* The spatial resolution of the halo                                */			
-  int    refLev;         /* The deepest refinement level:  0 - is the what we start AHF on    */			
-  
+  double spaRes;         /* The spatial resolution of the halo                                */
+  int    refLev;         /* The deepest refinement level:  0 - is the what we start AHF on    */
+
   int    numNodes;       /* number of nodes in this halo                                      */
-  
+
 #	if (defined WITH_MPI || defined AHFrestart)
   boolean ignoreme;
 #	endif
-  
+
 #ifdef AHFnewHaloIDs
   /*--------------------------------------------
    * unique IDs to be used for the output files
@@ -783,7 +784,7 @@ typedef struct {
   uint64_t haloID;
   uint64_t hostHaloID;
 #endif
-  
+
 } HALO;
 
 typedef struct {
@@ -810,9 +811,9 @@ typedef struct info_ahf
 {
   int       no_grids;    /* Number of grids used in AHF    */
   int       min_ref;     /* coarsest grid to be considered */
-  
+
   /* timing information */
-  time_t    time;  
+  time_t    time;
 } info_ahf;
 
 /*=============================================================================
@@ -828,7 +829,7 @@ typedef struct info_timing
   time_t      loadbalance;
   time_t      sfckey;
   time_t      distribution;
-  
+
   // AHF only timings
   time_t    gendomgrids;
   time_t    ll;
@@ -843,7 +844,7 @@ typedef struct info_timing
   time_t    ahf_halos_sfc_constructHalo;
   time_t    ahf_io;
   time_t    generate_tree;
-  
+
 } info_timing;
 
 
@@ -870,7 +871,7 @@ typedef struct info_layzer_irvine
   double  integral;
   double  econst;
   double  echeck;
-  
+
   time_t  time;
 } info_energy;
 
@@ -881,15 +882,15 @@ typedef struct info_Pk
 {
   double    *rk;
   double    *Pk;
-  
+
   double    Pk_ini;
   double    Pk_now;
-  
+
   double    Dgrowth_ini;
   double    Dgrowth_now;
-  
+
   int       dump_Pk;
-  
+
   time_t    time;
 } info_Pk;
 
@@ -905,7 +906,7 @@ typedef struct info_gadget
   int        nall1;
   partptr    lst_part;
   gasptr     lst_gas;
-  
+
 #ifdef LGADGET
   long long  IDmin;
   long long  IDmax;
@@ -914,11 +915,11 @@ typedef struct info_gadget
   int        IDmax;
 #endif
   double     mmin;
-  
+
   gasptr     fst_gas;
-  
+
   starptr    fst_star;
-  
+
   struct io_gadget_header
  {
   int      np[6];
@@ -935,8 +936,8 @@ typedef struct info_gadget
   double   OmegaLambda;
   double   HubbleParam;
   char     unused[SIZEOFGADGETHEADER- 6*4- 6*8- 2*8- 2*4- 6*4- 2*4 - 4*8];
- } header; 
-  
+ } header;
+
 } info_gadget;
 
 /*==============================================================*/
@@ -991,12 +992,12 @@ struct tipsy_dump {
   int    nsph;
   int    ndark;
   int    nstar;
-  
+
   /* Jeremy Balin addition */
   char align[ (32 - sizeof(double) - 5 * sizeof(int)) / sizeof(char) ];
   /* total size should be 32 bytes to make alignment okay with
    * 64-bit architectures (ie. alphas) */
-  
+
 } ;
 #endif /* TIPSY */
 
