@@ -164,6 +164,7 @@ void get_axes(double itensor[3][3], double *axis1, double *axis2, double *axis3)
    *axis2 = d[idx[2]];
    *axis3 = d[idx[1]];
 
+/* raw shape rather than eigenvectors
    itensor[0][0] = v[1][idx[3]];
    itensor[1][0] = v[2][idx[3]];
    itensor[2][0] = v[3][idx[3]];
@@ -175,6 +176,7 @@ void get_axes(double itensor[3][3], double *axis1, double *axis2, double *axis3)
    itensor[0][2] = v[1][idx[1]];
    itensor[1][2] = v[2][idx[1]];
    itensor[2][2] = v[3][idx[1]];
+*/
 }
 
 /*==============================================================================

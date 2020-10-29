@@ -70,7 +70,7 @@
 #define AHFnoremunbound           /* do not perform an unbinding procedure                          */
 //#define AHFnoHubbleDrag           /* will not consider the Hubble term when unbinding               */
 //#define AHFignore_ugas            /* ignores thermal energy of gas particles                        */
-//#define AHFreducedinertiatensor   /* use reduced inertia tensor for shape deterimations             */
+#define AHFreducedinertiatensor   /* use reduced inertia tensor for shape deterimations             */
 //#define AHFprofilerise            /* checks for rising profile in rem_outsideRvir() and chops halo  */
 //#define AHFsplinefit              /* this will use a spline-interpolation to get Rmax, Vmax, and r2 (use with caution as it may not work for the low-mass haloes!) */
 //#define AHFphspdens               /* add additional information about phase-space density to output */
